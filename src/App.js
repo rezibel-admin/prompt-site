@@ -5,7 +5,7 @@ import {
   MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX, ChevronRight, ChevronLeft
 } from 'lucide-react';
 
-// --- CONFIG & CREDENTIALS ---
+// --- CONFIG ---
 const supabaseUrl = 'https://bibgekufrjfokauiksca.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpYmdla3Vmcmpmb2thdWlrc2NhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwODM4MDYsImV4cCI6MjA4NjY1OTgwNn0.VcBiqjnYS4adCa-mzp00Z-Ki3keWECi9qea3iYJk_Yw';
 const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
@@ -28,7 +28,7 @@ const PRESET_PACKAGES = [
   { id: 'pkg_core', name: 'CORE', display_title: 'CORE', price: '25', type: 'Core', details: ["۱ عدد تصویربرداری حضوری (سینمایی)", "۵ شات عکاسی 4K صنعتی", "۴ عدد ویدئو با AI", "سناریونویسی خلاقانه", "آنالیز رشد", "ادمینی و فروش"] },
   { id: 'pkg_fusion', name: 'FUSION', display_title: 'FUSION', price: '45', type: 'Fusion', details: ["۴ عدد تصویربرداری حضوری (FPV)", "۱۰ شات عکاسی 4K صنعتی", "ترکیب ویدیو با AI", "۸ عدد ویدئو با AI", "لوگو و هویت بصری", "مدیریت فروش"] },
   { id: 'pkg_quantum', name: 'QUANTUM', display_title: 'QUANTUM', price: '85', type: 'Quantum', details: ["۸ عدد تصویربرداری حضوری", "۲۰ شات عکاسی 4K سینمایی", "۱۲ عدد ویدئو با AI", "طراحی بیزنس‌پلن اختصاصی", "سفیر برند مجازی", "سئو استراتژیک"] },
-  { id: 'pkg_tactical', name: 'TACTICAL', display_title: 'خدمات تکی', price: 'Variable', type: 'Tactical', details: ["تولید انیمیشن اختصاصی", "مدیریت گوگل‌مپ", "فیلمبرداری تک جلسه", "عکاسی صنعتی", "طراحی و پشتیبانی سایت"] }
+  { id: 'pkg_tactical', name: 'TACTICAL', display_title: 'خدمات تکی', price: 'Variable', type: 'Tactical', details: ["تولید انیمیشن اختصاصی", "مدیریت تخصصی گوگل‌مپ", "فیلمبرداری تک جلسه", "عکاسی صنعتی", "طراحی و پشتیبانی سایت"] }
 ];
 
 const NEURAL_MODULES = [
@@ -52,7 +52,6 @@ const App = () => {
 
   const bgMusic = useRef(new Audio(BG_MUSIC_URL));
   const greeting = useRef(new Audio(GREETING_URL));
-  const scrollRef = useRef(null);
 
   useEffect(() => {
     if (window.supabase) {
@@ -80,8 +79,8 @@ const App = () => {
 
   const initializeProtocol = () => {
     setEntered(true);
-    greeting.current.play().catch(e => console.log(e));
-    bgMusic.current.play().catch(e => console.log(e));
+    greeting.current.play();
+    bgMusic.current.play();
   };
 
   const handleVideoOpen = (video) => {
@@ -101,24 +100,20 @@ const App = () => {
         @font-face { font-family: 'Vazirmatn'; src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Medium.woff2') format('woff2'); }
         body { font-family: 'Vazirmatn', sans-serif; background: #020202; }
         
-        /* Luxurious Animated Halos */
+        /* Animated Silver Halos */
         .halo-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .halo-1 { position: absolute; top: -10%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(192,192,192,0.05) 0%, transparent 70%); animation: drift 20s infinite alternate; }
-        .halo-2 { position: absolute; bottom: -10%; right: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(64,224,208,0.03) 0%, transparent 70%); animation: drift 25s infinite alternate-reverse; }
+        .halo-1 { position: absolute; top: -10%; left: -10%; width: 60%; height: 60%; background: radial-gradient(circle, rgba(192,192,192,0.06) 0%, transparent 70%); animation: drift 20s infinite alternate; }
+        .halo-2 { position: absolute; bottom: -10%; right: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(64,224,208,0.04) 0%, transparent 70%); animation: drift 25s infinite alternate-reverse; }
         @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(10%, 10%) scale(1.1); } }
         
-        /* Glass UI */
-        .glass-luxury { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-luxury { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .responsive-title { font-size: clamp(2.5rem, 13vw, 11rem); line-height: 0.9; }
         
-        /* Fluid Typography Fix for Mobile Clipping */
-        .responsive-title { font-size: clamp(2.5rem, 12vw, 10rem); line-height: 0.95; }
-        
-        /* Anti-Download Settings */
+        /* Anti-Download Shield */
         video::-internal-media-controls-download-button { display:none; }
         video::-webkit-media-controls-enclosure { overflow:hidden; }
         video::-webkit-media-controls-panel { width: calc(100% + 30px); }
         
-        /* Custom Horizontal Scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}} />
@@ -128,20 +123,17 @@ const App = () => {
         <div className="halo-2" />
       </div>
 
-      {/* --- SPLASH SCREEN --- */}
       {!entered && (
-        <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center" onClick={initializeProtocol}>
-          <h1 className="responsive-title font-black tracking-tighter text-white select-none italic mb-12 animate-pulse">PROMPT</h1>
+        <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center cursor-pointer" onClick={initializeProtocol}>
+          <h1 className="responsive-title font-black tracking-tighter text-white italic mb-12 animate-pulse">PROMPT</h1>
           <div className="flex items-center gap-4 text-zinc-500 text-[10px] tracking-[0.5em] uppercase">
             <MousePointer2 size={16}/> <span>Initialize Protocol</span>
           </div>
         </div>
       )}
 
-      {/* --- MAIN INTERFACE --- */}
       <div className={`transition-opacity duration-1000 ${entered ? 'opacity-100' : 'opacity-0'}`}>
         
-        {/* Navigation */}
         <nav className="p-6 md:p-10 flex justify-between items-center fixed top-0 w-full z-[100] backdrop-blur-3xl bg-black/30 border-b border-white/5">
            <div className="flex gap-4">
              <button onClick={() => setIsMuted(!isMuted)} className="p-3 glass-luxury rounded-full">
@@ -157,52 +149,43 @@ const App = () => {
            </div>
         </nav>
 
-        <main className="max-w-[1800px] mx-auto px-6 py-40">
+        <main className="max-w-[1900px] mx-auto px-6 py-40">
           <header className="text-center mb-64">
             <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic">
               VISUAL <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#40E0D0] via-white to-[#40E0D0] bg-[length:200%_auto] animate-[shimmer_5s_linear_infinite]">SUPREMACY</span>
             </h1>
           </header>
 
-          {/* 1. Archives Section (Horizontal Scroll) */}
           <section className="mb-80 overflow-hidden">
             <div className="flex justify-between items-end mb-16 border-b border-white/5 pb-10">
-               <h2 className="text-5xl md:text-7xl font-black tracking-tight uppercase italic">Archives</h2>
-               <p className="text-[#40E0D0] tracking-[0.4em] text-[10px] uppercase font-bold">Neural Repository</p>
+               <h2 className="text-4xl md:text-6xl font-black tracking-tight uppercase italic">Archives</h2>
+               <p className="text-[#40E0D0] tracking-[0.4em] text-[10px] uppercase font-bold">Neural Cinematic Repository</p>
             </div>
-            
-            <div className="relative group">
-              <div 
-                ref={scrollRef}
-                className="flex gap-10 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-10 px-4"
-                style={{ scrollBehavior: 'smooth' }}
-              >
-                {portfolio.map((item) => (
-                  <div key={item.id} className="min-w-[85vw] md:min-w-[450px] aspect-[9/16] md:aspect-[3/4] rounded-[4rem] overflow-hidden border border-white/5 glass-luxury snap-center transition-all duration-700 hover:scale-[1.02] hover:border-[#40E0D0]/30 relative group/card">
-                    <div className="absolute inset-0 cursor-pointer" onClick={() => handleVideoOpen(item)}>
-                      <img src={item.cover_url} className="w-full h-full object-cover opacity-50 group-hover/card:opacity-100 transition-all duration-1000 grayscale group-hover/card:grayscale-0" alt=""/>
-                      <div className="absolute inset-0 flex flex-col justify-end p-12 bg-gradient-to-t from-black/80 via-transparent">
-                        <div className="w-16 h-16 rounded-full border border-[#40E0D0]/40 flex items-center justify-center text-[#40E0D0] mb-6 backdrop-blur-xl group-hover/card:bg-[#40E0D0] group-hover/card:text-black transition-all">
-                          <Play size={24} fill="currentColor"/>
-                        </div>
-                        <h3 className="text-3xl font-black uppercase tracking-widest">{item.title}</h3>
+            <div className="flex gap-10 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-10 px-4">
+              {portfolio.map((item) => (
+                <div key={item.id} className="min-w-[85vw] md:min-w-[450px] aspect-[9/16] md:aspect-[3/4] rounded-[4rem] overflow-hidden border border-white/5 glass-luxury snap-center transition-all duration-700 hover:scale-[1.02] hover:border-[#40E0D0]/30 relative group/card">
+                  <div className="absolute inset-0 cursor-pointer" onClick={() => handleVideoOpen(item)}>
+                    <img src={item.cover_url} className="w-full h-full object-cover opacity-50 group-hover/card:opacity-100 transition-all duration-1000 grayscale group-hover/card:grayscale-0" alt=""/>
+                    <div className="absolute inset-0 flex flex-col justify-end p-12 bg-gradient-to-t from-black/90 via-transparent">
+                      <div className="w-16 h-16 rounded-full border border-[#40E0D0]/40 flex items-center justify-center text-[#40E0D0] mb-6 backdrop-blur-xl group-hover/card:bg-[#40E0D0] group-hover/card:text-black transition-all">
+                        <Play size={24} fill="currentColor"/>
                       </div>
+                      <h3 className="text-3xl font-black uppercase tracking-widest">{item.title}</h3>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </section>
 
-          {/* 2. Proposals Section (Luxury Grid) */}
           <section className="mb-80">
              <div className="text-center mb-32">
                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 italic">Proposals</h2>
-               <p className="text-zinc-500 tracking-[0.4em] uppercase text-[9px]">Strategic Alliance Packages</p>
+               <p className="text-zinc-500 tracking-[0.4em] uppercase text-[9px] font-bold italic">Strategic Alliance Packages</p>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                 {PRESET_PACKAGES.map(pkg => (
-                  <div key={pkg.id} onClick={() => setPreviewPackage(pkg)} className={`p-10 rounded-[3.5rem] min-h-[550px] flex flex-col justify-between cursor-pointer border border-white/5 glass-luxury hover:bg-white/5 transition-all duration-500 ${pkg.type === 'Fusion' ? 'border-[#40E0D0]/40 scale-105 z-10' : ''}`}>
+                  <div key={pkg.id} onClick={() => setPreviewPackage(pkg)} className={`p-10 rounded-[3.5rem] min-h-[550px] flex flex-col justify-between cursor-pointer border border-white/5 glass-luxury hover:bg-white/5 transition-all duration-500 ${pkg.type === 'Fusion' ? 'border-[#40E0D0]/40 scale-105 z-10 bg-[#40E0D0]/5' : ''}`}>
                       <div>
                         <div className={`mb-8 p-5 rounded-3xl inline-block ${pkg.type === 'Fusion' ? 'bg-[#40E0D0]/10 text-[#40E0D0]' : 'bg-white/5 text-zinc-400'}`}>
                           {pkg.type === 'Core' && <Cpu size={32}/>}
@@ -215,18 +198,17 @@ const App = () => {
                           {pkg.price} <span className="text-[10px] text-white opacity-40">M T</span>
                         </div>
                       </div>
-                      <div className="mt-10 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Specs <Plus size={14}/></div>
+                      <div className="mt-10 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity">Specs <Plus size={14}/></div>
                   </div>
                 ))}
              </div>
           </section>
 
-          {/* 3. Neural Grid (AI Tools - Fixed and Integrated) */}
           <section className="mb-64">
             <div className="text-center mb-24">
                <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-[#40E0D0]/10 text-[#40E0D0] border border-[#40E0D0]/30 animate-pulse"><Bot size={16}/> <span>NEURAL CORE ACTIVE</span></div>
                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 italic">Neural Grid</h2>
-               <p className="text-zinc-500 tracking-[0.3em] uppercase">Intelligence Modules</p>
+               <p className="text-zinc-500 tracking-[0.3em] uppercase text-[9px] font-bold italic">Intelligence Modules</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {NEURAL_MODULES.map((module) => (
@@ -246,20 +228,19 @@ const App = () => {
         </main>
 
         <footer className="mt-64 border-t border-white/5 bg-black py-32 text-center md:text-right">
-            <div className="max-w-[1800px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-20">
+            <div className="max-w-[1900px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-20">
                <div className="p-8 rounded-[3.5rem] glass-luxury border border-[#40E0D0]/20">
                   <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.href}&color=40E0D0&bgcolor=000&margin=2`} className="w-24 h-24 rounded-2xl opacity-60 hover:opacity-100 transition-opacity" alt="Sovereign QR" />
                </div>
                <div>
-                  <h2 className="text-8xl md:text-[12rem] font-black shimmer-text leading-none tracking-tighter italic">REZIBEL</h2>
-                  <p className="text-[#40E0D0] text-xs font-black tracking-[0.5em] uppercase mt-10">Core Architect & Sovereign Director</p>
+                  <h2 className="text-8xl md:text-[12rem] font-black leading-none tracking-tighter italic text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-800">REZIBEL</h2>
+                  <p className="text-[#40E0D0] text-xs font-black tracking-[0.5em] uppercase mt-10 italic">Core Architect & Sovereign Director</p>
                   <p className="text-[8px] text-zinc-800 tracking-[0.6em] uppercase mt-20 font-bold">© 2026 Sovereign Authority | Visual Hegemony Reserved</p>
                </div>
             </div>
         </footer>
       </div>
 
-      {/* --- ELITE MODALS --- */}
       {activeVideo && (
         <div className="fixed inset-0 z-[5000] bg-black/98 flex items-center justify-center p-4 md:p-10 backdrop-blur-3xl" onContextMenu={(e) => e.preventDefault()}>
           <button onClick={handleVideoClose} className="absolute top-8 left-8 p-5 glass-luxury rounded-full hover:bg-white hover:text-black z-50 transition-all duration-500"><X size={32}/></button>
@@ -280,7 +261,6 @@ const App = () => {
         </div>
       )}
 
-      {/* Admin Verification Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[6000] bg-black/98 flex items-center justify-center p-6 backdrop-blur-3xl">
           <div className="w-full max-w-md p-14 rounded-[4rem] glass-luxury text-center">
