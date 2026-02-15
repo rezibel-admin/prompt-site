@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, Trash2, X, Lock, LogOut, Crown, RefreshCw, Cpu, Atom, Gem, Briefcase, 
   Plus, CheckCircle2, ArrowUp, ArrowDown, Save, QrCode, Image as ImageIcon, 
-  MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX
+  MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX, ChevronRight, ChevronLeft
 } from 'lucide-react';
 
 // --- CONFIG & CREDENTIALS ---
@@ -27,8 +27,15 @@ const formatPersianText = (text) => {
 const PRESET_PACKAGES = [
   { id: 'pkg_core', name: 'CORE', display_title: 'CORE', price: '25', type: 'Core', details: ["۱ عدد تصویربرداری حضوری (سینمایی)", "۵ شات عکاسی 4K صنعتی", "۴ عدد ویدئو با AI", "سناریونویسی خلاقانه", "آنالیز رشد", "ادمینی و فروش"] },
   { id: 'pkg_fusion', name: 'FUSION', display_title: 'FUSION', price: '45', type: 'Fusion', details: ["۴ عدد تصویربرداری حضوری (FPV)", "۱۰ شات عکاسی 4K صنعتی", "ترکیب ویدیو با AI", "۸ عدد ویدئو با AI", "لوگو و هویت بصری", "مدیریت فروش"] },
-  { id: 'pkg_quantum', name: 'QUANTUM', display_title: 'QUANTUM', price: '85', type: 'Quantum', details: ["۸ عدد تصویربرداری حضوری", "۲۰ شات عکاسی 4K سینمایی", "۱۲ عدد ویدئو با AI", "طراحی بیزنس‌پلن", "سفیر برند مجازی", "سئو استراتژیک"] },
-  { id: 'pkg_tactical', name: 'TACTICAL', display_title: 'خدمات تکی', price: 'Variable', type: 'Tactical', details: ["انیمیشن اختصاصی", "مدیریت گوگل‌مپ", "فیلمبرداری تک جلسه", "عکاسی صنعتی", "طراحی سایت"] }
+  { id: 'pkg_quantum', name: 'QUANTUM', display_title: 'QUANTUM', price: '85', type: 'Quantum', details: ["۸ عدد تصویربرداری حضوری", "۲۰ شات عکاسی 4K سینمایی", "۱۲ عدد ویدئو با AI", "طراحی بیزنس‌پلن اختصاصی", "سفیر برند مجازی", "سئو استراتژیک"] },
+  { id: 'pkg_tactical', name: 'TACTICAL', display_title: 'خدمات تکی', price: 'Variable', type: 'Tactical', details: ["تولید انیمیشن اختصاصی", "مدیریت گوگل‌مپ", "فیلمبرداری تک جلسه", "عکاسی صنعتی", "طراحی و پشتیبانی سایت"] }
+];
+
+const NEURAL_MODULES = [
+  { id: 'visual_engine', title: 'Visual Engine', fa_title: 'موتور تصویرسازی', limit: 5, icon: <ImageIcon size={24}/>, desc: 'توصیف صحنه را بنویسید تا هوش مصنوعی آن را به تصویر تبدیل کند.', type: 'image' },
+  { id: 'quantum_script', title: 'Quantum Script', fa_title: 'سناریو نویس', limit: 3, icon: <MessageSquare size={24}/>, desc: 'موضوع محصول را بنویسید تا سناریوی ویروسی دریافت کنید.', type: 'text' },
+  { id: 'oracle', title: 'Oracle Strategy', fa_title: 'مشاور استراتژیک', limit: 5, icon: <Target size={24}/>, desc: 'سوالات خود درباره رشد پیج را بپرسید.', type: 'text' },
+  { id: 'nexus', title: 'Nexus Protocol', fa_title: 'نگارش رسمی', limit: 10, icon: <Wand2 size={24}/>, desc: 'تبدیل متن به اداری و با پرستیژ.', type: 'text' }
 ];
 
 const App = () => {
@@ -41,11 +48,11 @@ const App = () => {
   const [loginForm, setLoginForm] = useState({ user: '', pass: '' });
   const [supabase, setSupabase] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
-  const [newProject, setNewProject] = useState({ title: '', video_url: '', cover_url: '' });
   const [videoLoading, setVideoLoading] = useState(true);
 
   const bgMusic = useRef(new Audio(BG_MUSIC_URL));
   const greeting = useRef(new Audio(GREETING_URL));
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     if (window.supabase) {
@@ -73,8 +80,8 @@ const App = () => {
 
   const initializeProtocol = () => {
     setEntered(true);
-    greeting.current.play();
-    bgMusic.current.play();
+    greeting.current.play().catch(e => console.log(e));
+    bgMusic.current.play().catch(e => console.log(e));
   };
 
   const handleVideoOpen = (video) => {
@@ -88,175 +95,176 @@ const App = () => {
     if (!isMuted) bgMusic.current.play();
   };
 
-  const moveVideo = (index, direction) => {
-    const newP = [...portfolio];
-    if (direction === 'up' && index > 0) [newP[index], newP[index-1]] = [newP[index-1], newP[index]];
-    else if (direction === 'down' && index < newP.length - 1) [newP[index], newP[index+1]] = [newP[index+1], newP[index]];
-    setPortfolio(newP);
-  };
-
-  const deleteVideo = async (id) => {
-    if (!window.confirm("Delete Asset?")) return;
-    setPortfolio(prev => prev.filter(v => v.id !== id));
-    await supabase.from('archives').delete().eq('id', id);
-  };
-
   return (
-    <div className="min-h-screen bg-[#050505] text-white overflow-x-hidden font-sans selection:bg-[#40E0D0]/30 pb-20 relative">
+    <div className="min-h-screen bg-[#020202] text-white overflow-x-hidden font-sans selection:bg-[#40E0D0]/30 pb-20 relative">
       <style dangerouslySetInnerHTML={{ __html: `
         @font-face { font-family: 'Vazirmatn'; src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Medium.woff2') format('woff2'); }
-        body { font-family: 'Vazirmatn', sans-serif; background-color: #050505; }
+        body { font-family: 'Vazirmatn', sans-serif; background: #020202; }
         
-        /* 2026 Grainy Texture Overlay */
-        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: url(https://grainy-gradients.vercel.app/noise.svg); opacity: 0.05; z-index: 9999; }
+        /* Luxurious Animated Halos */
+        .halo-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .halo-1 { position: absolute; top: -10%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(192,192,192,0.05) 0%, transparent 70%); animation: drift 20s infinite alternate; }
+        .halo-2 { position: absolute; bottom: -10%; right: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(64,224,208,0.03) 0%, transparent 70%); animation: drift 25s infinite alternate-reverse; }
+        @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(10%, 10%) scale(1.1); } }
         
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .breathing-core { animation: breathe 5s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 30px #40E0D033); } 50% { transform: scale(1.02); filter: drop-shadow(0 0 60px #40E0D066); } }
+        /* Glass UI */
+        .glass-luxury { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.05); }
         
-        /* Fluid Typography Fix */
-        .hero-text { font-size: clamp(3rem, 15vw, 10rem); line-height: 0.9; }
-        .section-title { font-size: clamp(2rem, 8vw, 5rem); }
+        /* Fluid Typography Fix for Mobile Clipping */
+        .responsive-title { font-size: clamp(2.5rem, 12vw, 10rem); line-height: 0.95; }
         
-        /* Hide Download Button in Chrome */
+        /* Anti-Download Settings */
         video::-internal-media-controls-download-button { display:none; }
         video::-webkit-media-controls-enclosure { overflow:hidden; }
         video::-webkit-media-controls-panel { width: calc(100% + 30px); }
+        
+        /* Custom Horizontal Scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}} />
+
+      <div className="halo-bg">
+        <div className="halo-1" />
+        <div className="halo-2" />
+      </div>
 
       {/* --- SPLASH SCREEN --- */}
       {!entered && (
-        <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center">
-          <h1 className="hero-text font-black breathing-core tracking-tighter text-white select-none italic mb-10">PROMPT</h1>
-          <button onClick={initializeProtocol} className="group relative px-12 py-5 border border-[#40E0D0]/40 hover:border-[#40E0D0] transition-all overflow-hidden rounded-full">
-            <span className="relative z-10 text-[#40E0D0] font-black tracking-[0.5em] text-[10px] uppercase group-hover:text-black">Enter Sovereign Vault</span>
-            <div className="absolute inset-0 bg-[#40E0D0] translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-          </button>
+        <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center" onClick={initializeProtocol}>
+          <h1 className="responsive-title font-black tracking-tighter text-white select-none italic mb-12 animate-pulse">PROMPT</h1>
+          <div className="flex items-center gap-4 text-zinc-500 text-[10px] tracking-[0.5em] uppercase">
+            <MousePointer2 size={16}/> <span>Initialize Protocol</span>
+          </div>
         </div>
       )}
 
-      {/* --- MAIN UI --- */}
+      {/* --- MAIN INTERFACE --- */}
       <div className={`transition-opacity duration-1000 ${entered ? 'opacity-100' : 'opacity-0'}`}>
         
         {/* Navigation */}
-        <nav className="p-6 md:p-10 flex justify-between items-center fixed top-0 w-full z-[100] backdrop-blur-xl bg-black/40 border-b border-white/5">
+        <nav className="p-6 md:p-10 flex justify-between items-center fixed top-0 w-full z-[100] backdrop-blur-3xl bg-black/30 border-b border-white/5">
            <div className="flex gap-4">
-             <button onClick={() => setIsMuted(!isMuted)} className="p-3 glass rounded-full hover:bg-white/5 transition-all">
+             <button onClick={() => setIsMuted(!isMuted)} className="p-3 glass-luxury rounded-full">
                {isMuted ? <VolumeX className="text-red-500" /> : <Volume2 className="text-[#40E0D0]" />}
              </button>
-             <button onClick={() => setShowLoginModal(true)} className="p-3 glass rounded-full hover:text-[#40E0D0] transition-all">
+             <button onClick={() => setShowLoginModal(true)} className="p-3 glass-luxury rounded-full hover:text-[#40E0D0]">
                <Lock size={20}/>
              </button>
-             {isAdmin && (
-               <button onClick={async () => {
-                 const updates = portfolio.map((item, index) => ({ ...item, order_index: index }));
-                 await supabase.from('archives').upsert(updates);
-                 alert("SYNCED");
-               }} className="flex items-center gap-2 px-6 py-3 bg-[#40E0D0]/10 border border-[#40E0D0]/30 rounded-full text-[#40E0D0] hover:bg-[#40E0D0] hover:text-black transition-all">
-                 <Save size={16}/> <span className="text-[10px] font-black uppercase tracking-widest">Update Vault</span>
-               </button>
-             )}
            </div>
-
            <div className="text-right">
              <div className="text-xl md:text-2xl font-black tracking-tighter">PROMPT</div>
-             <div className="text-[7px] tracking-[0.4em] text-[#40E0D0] uppercase">Sovereign Authority</div>
+             <div className="text-[7px] tracking-[0.4em] text-[#40E0D0] uppercase italic">Sovereign Authority</div>
            </div>
         </nav>
 
-        <main className="max-w-[1600px] mx-auto px-6 py-40">
-          <header className="text-center mb-64 relative">
-            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[80%] h-64 bg-[#40E0D0]/5 blur-[120px] rounded-full" />
-            <h1 className="hero-text font-black tracking-tighter uppercase select-none relative z-10">
+        <main className="max-w-[1800px] mx-auto px-6 py-40">
+          <header className="text-center mb-64">
+            <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic">
               VISUAL <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#40E0D0] via-white to-[#40E0D0] bg-[length:200%_auto] animate-[shimmer_5s_linear_infinite]">SUPREMACY</span>
             </h1>
           </header>
 
-          {/* Archives Section */}
-          <section className="mb-80">
-            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-16 border-b border-white/5 pb-10 gap-4">
-               <h2 className="section-title font-black tracking-tight uppercase italic">Archives</h2>
-               <p className="text-[#40E0D0] tracking-[0.5em] text-[10px] uppercase font-bold">Neural Cinematic Repository</p>
+          {/* 1. Archives Section (Horizontal Scroll) */}
+          <section className="mb-80 overflow-hidden">
+            <div className="flex justify-between items-end mb-16 border-b border-white/5 pb-10">
+               <h2 className="text-5xl md:text-7xl font-black tracking-tight uppercase italic">Archives</h2>
+               <p className="text-[#40E0D0] tracking-[0.4em] text-[10px] uppercase font-bold">Neural Repository</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-14">
-              {portfolio.map((item, index) => (
-                <div key={item.id} className="group relative aspect-[9/16] md:aspect-[3/4] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden border border-white/5 bg-zinc-900/50 shadow-2xl transition-all duration-700 hover:scale-[1.03] hover:border-[#40E0D0]/20">
-                  <div className="absolute inset-0 cursor-pointer" onClick={() => handleVideoOpen(item)}>
-                    <img src={item.cover_url} className="w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-all duration-1000 grayscale group-hover:grayscale-0" alt=""/>
-                    <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black via-transparent">
-                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/40 flex items-center justify-center text-[#40E0D0] mb-6 glass group-hover:bg-[#40E0D0] group-hover:text-black transition-all duration-500 scale-90 group-hover:scale-110">
-                        <Play size={24} fill="currentColor"/>
+            <div className="relative group">
+              <div 
+                ref={scrollRef}
+                className="flex gap-10 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-10 px-4"
+                style={{ scrollBehavior: 'smooth' }}
+              >
+                {portfolio.map((item) => (
+                  <div key={item.id} className="min-w-[85vw] md:min-w-[450px] aspect-[9/16] md:aspect-[3/4] rounded-[4rem] overflow-hidden border border-white/5 glass-luxury snap-center transition-all duration-700 hover:scale-[1.02] hover:border-[#40E0D0]/30 relative group/card">
+                    <div className="absolute inset-0 cursor-pointer" onClick={() => handleVideoOpen(item)}>
+                      <img src={item.cover_url} className="w-full h-full object-cover opacity-50 group-hover/card:opacity-100 transition-all duration-1000 grayscale group-hover/card:grayscale-0" alt=""/>
+                      <div className="absolute inset-0 flex flex-col justify-end p-12 bg-gradient-to-t from-black/80 via-transparent">
+                        <div className="w-16 h-16 rounded-full border border-[#40E0D0]/40 flex items-center justify-center text-[#40E0D0] mb-6 backdrop-blur-xl group-hover/card:bg-[#40E0D0] group-hover/card:text-black transition-all">
+                          <Play size={24} fill="currentColor"/>
+                        </div>
+                        <h3 className="text-3xl font-black uppercase tracking-widest">{item.title}</h3>
                       </div>
-                      <h3 className="text-xl md:text-2xl font-black uppercase tracking-widest drop-shadow-2xl">{item.title}</h3>
                     </div>
                   </div>
-                  {isAdmin && (
-                    <div className="absolute top-6 right-6 p-4 flex flex-col gap-2 z-20 glass rounded-3xl">
-                      <button onClick={() => moveVideo(index, 'up')} className="p-2 hover:text-[#40E0D0] transition-colors"><ArrowUp size={16}/></button>
-                      <button onClick={() => moveVideo(index, 'down')} className="p-2 hover:text-[#40E0D0] transition-colors"><ArrowDown size={16}/></button>
-                      <button onClick={() => deleteVideo(item.id)} className="p-2 text-red-500 hover:scale-125 transition-transform"><Trash2 size={16}/></button>
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
 
-          {/* Proposals Section */}
-          <section className="mb-80 relative">
-             <div className="absolute -left-40 top-1/2 -translate-y-1/2 w-96 h-96 bg-[#40E0D0]/5 blur-[150px] rounded-full" />
+          {/* 2. Proposals Section (Luxury Grid) */}
+          <section className="mb-80">
              <div className="text-center mb-32">
-               <h2 className="section-title font-black uppercase tracking-tighter mb-4">Proposals / خدمات</h2>
-               <p className="text-zinc-500 tracking-[0.4em] uppercase text-[9px] font-bold">Elite Strategic Alliances</p>
+               <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 italic">Proposals</h2>
+               <p className="text-zinc-500 tracking-[0.4em] uppercase text-[9px]">Strategic Alliance Packages</p>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
                 {PRESET_PACKAGES.map(pkg => (
-                  <div key={pkg.id} onClick={() => setPreviewPackage(pkg)} className={`p-10 rounded-[3rem] min-h-[550px] flex flex-col justify-between cursor-pointer border border-white/5 glass hover:bg-white/5 transition-all duration-500 ${pkg.type === 'Fusion' ? 'border-[#40E0D0]/40 bg-[#40E0D0]/5 scale-105 z-10' : ''}`}>
+                  <div key={pkg.id} onClick={() => setPreviewPackage(pkg)} className={`p-10 rounded-[3.5rem] min-h-[550px] flex flex-col justify-between cursor-pointer border border-white/5 glass-luxury hover:bg-white/5 transition-all duration-500 ${pkg.type === 'Fusion' ? 'border-[#40E0D0]/40 scale-105 z-10' : ''}`}>
                       <div>
-                        <div className={`mb-8 p-5 rounded-3xl inline-block ${pkg.type === 'Fusion' ? 'bg-[#40E0D0]/20 text-[#40E0D0]' : 'bg-white/5 text-zinc-400'}`}>
+                        <div className={`mb-8 p-5 rounded-3xl inline-block ${pkg.type === 'Fusion' ? 'bg-[#40E0D0]/10 text-[#40E0D0]' : 'bg-white/5 text-zinc-400'}`}>
                           {pkg.type === 'Core' && <Cpu size={32}/>}
                           {pkg.type === 'Fusion' && <Atom size={32}/>}
                           {pkg.type === 'Quantum' && <Gem size={32} className="text-[#D4AF37]"/>}
                           {pkg.type === 'Tactical' && <Briefcase size={32}/>}
                         </div>
-                        <h3 className="text-3xl font-black mb-3 tracking-tighter">{pkg.display_title}</h3>
-                        <div className="text-4xl font-black text-[#40E0D0] tracking-tighter">
-                          {pkg.price} <span className="text-[10px] text-white opacity-40 font-normal">M T / Sovereign</span>
+                        <h3 className="text-4xl font-black mb-3">{pkg.display_title}</h3>
+                        <div className={`text-3xl font-black ${pkg.type === 'Quantum' ? 'text-[#D4AF37]' : 'text-[#40E0D0]'}`}>
+                          {pkg.price} <span className="text-[10px] text-white opacity-40">M T</span>
                         </div>
                       </div>
-                      <div className="mt-10 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 hover:opacity-100 transition-opacity">Protocol Specs <Plus size={14}/></div>
+                      <div className="mt-10 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Specs <Plus size={14}/></div>
                   </div>
                 ))}
              </div>
           </section>
+
+          {/* 3. Neural Grid (AI Tools - Fixed and Integrated) */}
+          <section className="mb-64">
+            <div className="text-center mb-24">
+               <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-[#40E0D0]/10 text-[#40E0D0] border border-[#40E0D0]/30 animate-pulse"><Bot size={16}/> <span>NEURAL CORE ACTIVE</span></div>
+               <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 italic">Neural Grid</h2>
+               <p className="text-zinc-500 tracking-[0.3em] uppercase">Intelligence Modules</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {NEURAL_MODULES.map((module) => (
+                <div key={module.id} className="p-8 rounded-[3.5rem] border border-white/5 glass-luxury hover:border-[#40E0D0]/50 transition-all flex flex-col h-[550px] relative overflow-hidden group">
+                  <div className="mt-8 mb-6 text-[#40E0D0] bg-white/5 p-5 rounded-3xl w-fit group-hover:scale-110 transition-transform">{module.icon}</div>
+                  <h3 className="text-2xl font-black text-white uppercase">{module.title}</h3>
+                  <p className="text-sm text-[#40E0D0] mb-4 font-[Vazirmatn]">{module.fa_title}</p>
+                  <p className="text-xs text-zinc-400 leading-loose mb-10 font-[Vazirmatn]">{module.desc}</p>
+                  <div className="mt-auto flex flex-col gap-4">
+                    <textarea className="w-full bg-black/50 border border-white/10 p-4 rounded-2xl text-right text-xs text-white outline-none focus:border-[#40E0D0] h-24 resize-none" placeholder="متن خود را وارد کنید..."/>
+                    <button className="w-full py-4 bg-white text-black font-black text-[10px] tracking-[0.3em] rounded-2xl hover:bg-[#40E0D0] transition-all uppercase">Execute Protocol</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         </main>
 
-        <footer className="mt-64 border-t border-white/5 bg-[#030303] py-32 relative">
-            <div className="max-w-[1600px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-16">
-               <div className="flex flex-col items-center md:items-start gap-8 group">
-                  <div className="p-8 rounded-[3.5rem] glass group-hover:border-[#40E0D0]/30 transition-all duration-1000">
-                     <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.href}&color=40E0D0&bgcolor=000&margin=4`} className="w-20 h-20 rounded-2xl opacity-60 group-hover:opacity-100 transition-all duration-700" alt="Sovereign QR" />
-                  </div>
+        <footer className="mt-64 border-t border-white/5 bg-black py-32 text-center md:text-right">
+            <div className="max-w-[1800px] mx-auto px-10 flex flex-col md:flex-row justify-between items-center gap-20">
+               <div className="p-8 rounded-[3.5rem] glass-luxury border border-[#40E0D0]/20">
+                  <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.href}&color=40E0D0&bgcolor=000&margin=2`} className="w-24 h-24 rounded-2xl opacity-60 hover:opacity-100 transition-opacity" alt="Sovereign QR" />
                </div>
-               <div className="text-center md:text-right">
-                  <h2 className="text-7xl md:text-[10rem] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-800 select-none">REZIBEL</h2>
-                  <div className="flex items-center justify-center md:justify-end gap-5 mt-10">
-                     <div className="h-[1px] w-20 bg-[#40E0D0]/30 hidden md:block" />
-                     <span className="text-[#40E0D0] text-[10px] font-black tracking-[0.4em] uppercase">Core Architect & Sovereign Director</span>
-                  </div>
-                  <p className="text-[8px] text-zinc-800 tracking-[0.5em] uppercase mt-20 font-bold">© 2026 Sovereign Authority | Visual Hegemony Reserved</p>
+               <div>
+                  <h2 className="text-8xl md:text-[12rem] font-black shimmer-text leading-none tracking-tighter italic">REZIBEL</h2>
+                  <p className="text-[#40E0D0] text-xs font-black tracking-[0.5em] uppercase mt-10">Core Architect & Sovereign Director</p>
+                  <p className="text-[8px] text-zinc-800 tracking-[0.6em] uppercase mt-20 font-bold">© 2026 Sovereign Authority | Visual Hegemony Reserved</p>
                </div>
             </div>
         </footer>
       </div>
 
-      {/* --- ELITE MODALS (NO DOWNLOAD FIXED) --- */}
+      {/* --- ELITE MODALS --- */}
       {activeVideo && (
         <div className="fixed inset-0 z-[5000] bg-black/98 flex items-center justify-center p-4 md:p-10 backdrop-blur-3xl" onContextMenu={(e) => e.preventDefault()}>
-          <button onClick={handleVideoClose} className="absolute top-6 left-6 md:top-12 md:left-12 p-5 glass rounded-full hover:bg-white hover:text-black z-50 transition-all duration-500"><X size={32}/></button>
-          <div className="w-full max-w-lg md:max-w-xl aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-[#40E0D0]/20 shadow-[0_0_150px_rgba(64,224,208,0.1)] relative">
-            {videoLoading && <div className="absolute inset-0 flex items-center justify-center bg-[#050505] z-10"><Loader2 className="animate-spin text-[#40E0D0]" size={48}/></div>}
+          <button onClick={handleVideoClose} className="absolute top-8 left-8 p-5 glass-luxury rounded-full hover:bg-white hover:text-black z-50 transition-all duration-500"><X size={32}/></button>
+          <div className="w-full max-w-lg aspect-[9/16] rounded-[4rem] overflow-hidden border border-[#40E0D0]/20 shadow-[0_0_150px_rgba(64,224,208,0.1)] relative">
+            {videoLoading && <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 z-10"><Loader2 className="animate-spin text-[#40E0D0]" size={48}/></div>}
             <video 
               controls 
               autoPlay 
@@ -275,26 +283,24 @@ const App = () => {
       {/* Admin Verification Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 z-[6000] bg-black/98 flex items-center justify-center p-6 backdrop-blur-3xl">
-          <div className="w-full max-w-md p-14 rounded-[4rem] border border-white/10 glass text-center">
-            <Crown className="mx-auto text-[#40E0D0] mb-10 breathing-core" size={56}/>
-            <h3 className="text-xl font-black mb-10 tracking-[0.4em] uppercase">Identity Verification</h3>
-            <form onSubmit={(e) => { e.preventDefault(); if(loginForm.user === ADMIN_CREDENTIALS.user && loginForm.pass === ADMIN_CREDENTIALS.pass) { setIsAdmin(true); setShowLoginModal(false); } else alert("ACCESS DENIED BY SOVEREIGN SYSTEM"); }}>
+          <div className="w-full max-w-md p-14 rounded-[4rem] glass-luxury text-center">
+            <Crown className="mx-auto text-[#40E0D0] mb-10" size={56}/>
+            <form onSubmit={(e) => { e.preventDefault(); if(loginForm.user === ADMIN_CREDENTIALS.user && loginForm.pass === ADMIN_CREDENTIALS.pass) { setIsAdmin(true); setShowLoginModal(false); } else alert("DENIED"); }}>
               <input className="w-full bg-black/50 border border-white/10 p-5 rounded-3xl text-center mb-5 outline-none focus:border-[#40E0D0] transition-all" placeholder="ADMIN ID" value={loginForm.user} onChange={e=>setLoginForm({...loginForm, user:e.target.value})}/>
-              <input className="w-full bg-black/50 border border-white/10 p-5 rounded-3xl text-center mb-8 outline-none focus:border-[#40E0D0] transition-all" type="password" placeholder="CRYPTO KEY" value={loginForm.pass} onChange={e=>setLoginForm({...loginForm, pass:e.target.value})}/>
-              <button className="w-full py-5 bg-[#40E0D0] text-black font-black rounded-3xl uppercase tracking-widest text-xs hover:bg-white transition-all">Authorize Entry</button>
+              <input className="w-full bg-black/50 border border-white/10 p-5 rounded-3xl text-center mb-8 outline-none focus:border-[#40E0D0] transition-all" type="password" placeholder="KEY" value={loginForm.pass} onChange={e=>setLoginForm({...loginForm, pass:e.target.value})}/>
+              <button className="w-full py-5 bg-[#40E0D0] text-black font-black rounded-3xl uppercase tracking-widest text-xs">Authorize Entry</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Package Specs Modal */}
       {previewPackage && (
-        <div className="fixed inset-0 z-[5000] bg-black/95 flex items-center justify-center p-6 backdrop-blur-2xl" onClick={() => setPreviewPackage(null)}>
-           <div className="max-w-4xl w-full p-14 glass rounded-[4rem] text-right border border-[#40E0D0]/20 max-h-[85vh] overflow-y-auto relative" onClick={e=>e.stopPropagation()}>
-             <h2 className="text-5xl md:text-7xl font-black mb-14 text-white tracking-tighter uppercase italic">{previewPackage.display_title}</h2>
+        <div className="fixed inset-0 z-[5000] bg-black/95 flex items-center justify-center p-6 backdrop-blur-xl" onClick={() => setPreviewPackage(null)}>
+           <div className="max-w-4xl w-full p-14 glass-luxury rounded-[4rem] text-right border border-[#40E0D0]/20 max-h-[85vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+             <h2 className="text-5xl md:text-7xl font-black mb-14 text-white tracking-tighter italic uppercase">{previewPackage.display_title}</h2>
              <div className="space-y-6" dir="rtl">
                {previewPackage.details.map((d,i) => (
-                 <div key={i} className="flex items-center gap-5 text-xl md:text-2xl text-zinc-300 border-b border-white/5 pb-6 hover:text-[#40E0D0] transition-colors">
+                 <div key={i} className="flex items-center gap-5 text-xl md:text-2xl text-zinc-300 border-b border-white/5 pb-6">
                    <CheckCircle2 className="text-[#40E0D0]" size={24}/> {formatPersianText(d)}
                  </div>
                ))}
