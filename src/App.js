@@ -9,7 +9,11 @@ import {
 const supabaseUrl = 'https://bibgekufrjfokauiksca.supabase.co';
 const supabaseKey = 'sb_publishable_7VSrrcDIUHhZaRgUPsEwkw_jfLxxVdc';
 const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
-const GEMINI_API_KEY = ""; // 🔴 YOUR API KEY HERE 🔴
+const GEMINI_API_KEY = ""; // 🔴 کلید جمینای خود را در صورت داشتن اینجا وارد کنید 🔴
+
+// --- ASSETS ---
+// ✅ لینک کاراکتر شما در اینجا قرار گرفت:
+const CHARACTER_IMG = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/Gemini_Generated_Image_gvynjogvynjogvyn-removebg.png"; 
 
 const GREETING_URL = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/ElevenLabs_2026-02-15T18_14_14_Donovan%20-%20Articulate,%20Strong%20and%20Deep_pvc_sp100_s50_sb75_v3.mp3"; 
 const BG_MUSIC_URL = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/starostin-ambient-ambient-music-484374.mp3";
@@ -53,6 +57,8 @@ const App = () => {
   const [videoLoading, setVideoLoading] = useState(true);
   const [newProject, setNewProject] = useState({ title: '', video_url: '', cover_url: '', type: 'video' });
   const [quotas, setQuotas] = useState({});
+  
+  // AI Chat States
   const [showChat, setShowChat] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatLog, setChatLog] = useState([{ role: 'bot', text: "درود بر شما. من هوش مصنوعی پروتکل Sovereign هستم. چطور می‌توانم در مسیر حاکمیت بصری به شما کمک کنم؟" }]);
@@ -103,29 +109,37 @@ const App = () => {
   const initializeProtocol = () => {
     setEntered(true);
     const playAudio = async () => {
-      try { await greeting.current.play(); await bgMusic.current.play(); } 
-      catch (e) { console.log("Audio waiting for interaction"); }
+      try {
+        await greeting.current.play();
+        await bgMusic.current.play();
+      } catch (e) {
+        console.log("Auto-play blocked by browser policy, waiting for user interaction");
+      }
     };
     playAudio();
   };
 
   const toggleMute = () => {
-    if (isMuted) { bgMusic.current.play(); setIsMuted(false); } 
-    else { bgMusic.current.pause(); greeting.current.pause(); setIsMuted(true); }
+    if (isMuted) {
+      bgMusic.current.play();
+      setIsMuted(false);
+    } else {
+      bgMusic.current.pause();
+      greeting.current.pause();
+      setIsMuted(true);
+    }
   };
 
   const scrollVault = (direction) => {
     if (scrollRef.current) {
         const { scrollLeft, clientWidth } = scrollRef.current;
-        const step = clientWidth * 0.7; // Smoother step
+        const step = clientWidth * 0.7;
         scrollRef.current.scrollTo({ left: direction === 'left' ? scrollLeft - step : scrollLeft + step, behavior: 'smooth' });
     }
   };
 
   const handleChat = async () => {
     if (!chatInput.trim()) return;
-    if(!GEMINI_API_KEY) { alert("API Key Not Configured"); return; }
-    
     const userMsg = { role: 'user', text: chatInput };
     setChatLog(prev => [...prev, userMsg]);
     setChatInput("");
@@ -135,10 +149,12 @@ const App = () => {
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: `Act as the Sovereign AI Assistant for REZIBEL PROMPT. Respond in Persian. Tone: Professional, Cinematic, Luxury. Question: ${chatInput}` }] }] })
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `Act as the Sovereign AI Assistant for REZIBEL PROMPT. Respond in Persian. Tone: Professional, Cinematic, Luxury. Question: ${chatInput}` }] }]
+        })
       });
       const data = await response.json();
-      const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "پاسخی دریافت نشد.";
+      const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "خطا در دریافت پاسخ.";
       setChatLog(prev => [...prev, { role: 'bot', text: botText }]);
     } catch (e) {
       setChatLog(prev => [...prev, { role: 'bot', text: "ارتباط با هسته مرکزی برقرار نشد." }]);
@@ -151,7 +167,7 @@ const App = () => {
     const input = aiInputs[module.id];
     if (!input) return;
     const remaining = quotas[module.id] || 0;
-    if (remaining <= 0 && !isAdmin) return alert("سهمیه روزانه تمام شده است.");
+    if (remaining <= 0 && !isAdmin) return alert("سهمیه روزانه شما تمام شده است.");
 
     setIsAiLoading(prev => ({ ...prev, [module.id]: true }));
     setAiResults(prev => ({ ...prev, [module.id]: null }));
@@ -163,7 +179,6 @@ const App = () => {
         await new Promise(r => setTimeout(r, 1500)); 
         setAiResults(prev => ({ ...prev, [module.id]: imageUrl }));
       } else {
-        if (!GEMINI_API_KEY) throw new Error("API Key Missing");
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -199,22 +214,35 @@ const App = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,700&family=JetBrains+Mono:wght@300;700&display=swap');
         @font-face { font-family: 'Vazirmatn'; src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Medium.woff2') format('woff2'); }
+        
         body { font-family: 'Vazirmatn', sans-serif; background: #010101; }
         .font-serif { font-family: 'Cormorant Garamond', serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
+
         .noise { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url('https://grainy-gradients.vercel.app/noise.svg'); }
+        
         .liquid-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         .halo { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: move 20s infinite alternate; }
         .silver { background: radial-gradient(circle, #b0b0b0 0%, transparent 70%); width: 80vw; height: 80vw; top: -20%; left: -20%; }
         .cyan-h { background: radial-gradient(circle, #40E0D0 0%, transparent 70%); width: 60vw; height: 60vw; bottom: -10%; right: -10%; animation-delay: -5s; }
         @keyframes move { from { transform: translate(0,0) rotate(0deg); } to { transform: translate(10%, 10%) rotate(10deg); } }
+
+        .halo-breathing { position: absolute; width: 140%; height: 140%; background: radial-gradient(circle, rgba(64,224,208,0.25) 0%, transparent 70%); animation: breathe 4s infinite ease-in-out; }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 0.8; } }
+        
         .glass-luxury { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .responsive-title { font-size: clamp(3rem, 15vw, 13rem); line-height: 0.9; }
+        
         .snap-x { scroll-snap-type: x mandatory; }
         .snap-center { scroll-snap-align: center; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
         @keyframes bounce-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
         .animate-bounce-right { animation: bounce-right 1s infinite; }
+        
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        
         .silver-shine { background: linear-gradient(90deg, #fff 0%, #a0a0a0 50%, #fff 100%); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s infinite linear; }
         @keyframes shine { to { background-position: 200%; } }
       `}} />
@@ -222,10 +250,15 @@ const App = () => {
       <div className="noise" />
       <div className="liquid-bg"><div className="halo silver" /><div className="halo cyan-h" /></div>
 
+      {/* --- SPLASH SCREEN --- */}
       {!entered && (
         <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center cursor-pointer" onClick={initializeProtocol}>
-          <div className="relative flex items-center justify-center mb-12">
-            <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)]">PROMPT</h1>
+          <div className="relative flex flex-col items-center justify-center mb-12">
+            {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-40 md:w-56 mb-6 animate-float drop-shadow-[0_0_30px_rgba(64,224,208,0.3)] object-contain" />}
+            <div className="relative">
+               <div className="halo-breathing" />
+               <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)]">PROMPT</h1>
+            </div>
           </div>
           <div className="flex items-center gap-4 text-zinc-400 text-[10px] md:text-xs tracking-[0.5em] uppercase font-mono bg-white/5 px-6 py-3 rounded-full border border-white/10">
             <MousePointer2 size={16} className="text-[#40E0D0] animate-bounce-right"/> <span>Initialize Sovereign Protocol</span>
@@ -248,8 +281,14 @@ const App = () => {
         <main className="max-w-[2000px] mx-auto px-4 md:px-8 py-32 md:py-48">
           <header className="text-center mb-48 md:mb-80 relative">
             <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
+            
+            {/* --- CHARACTER IN MAIN BODY --- */}
+            <div className="flex justify-center -mt-10 md:-mt-20 relative z-10 pointer-events-none">
+               {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Avatar" className="w-32 md:w-56 opacity-80 animate-float object-contain drop-shadow-2xl" />}
+            </div>
           </header>
 
+          {/* 1. ARCHIVES */}
           <section className="mb-64 md:mb-96 relative group">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
@@ -271,13 +310,16 @@ const App = () => {
                 </div>
               ))}
             </div>
-            <div className="flex justify-between items-center px-6 mt-4 md:hidden opacity-80">
+            
+            {/* Mobile Nav */}
+            <div className="flex justify-between items-center px-4 mt-4 md:hidden opacity-60">
                <button onClick={() => scrollVault('left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
                <span className="text-[9px] tracking-[0.3em] uppercase font-mono">Swipe or Tap to Explore</span>
                <button onClick={() => scrollVault('right')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronRight size={24}/></button>
             </div>
           </section>
 
+          {/* NEURAL ANIMATIONS */}
           <section className="mb-64 md:mb-96 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
@@ -293,6 +335,7 @@ const App = () => {
             </div>
           </section>
 
+          {/* 2. PROPOSALS */}
           <section className="mb-64 md:mb-96">
              <div className="text-center mb-24 md:mb-40 px-4">
                <h2 className="text-5xl md:text-9xl font-black uppercase tracking-tighter mb-4 italic font-serif">Proposals</h2>
@@ -313,6 +356,7 @@ const App = () => {
              </div>
           </section>
 
+          {/* 3. NEURAL GRID */}
           <section className="mb-64">
             <div className="text-center mb-24 md:mb-32 px-4">
                <div className="inline-flex items-center gap-3 mb-6 px-5 py-2 rounded-full bg-[#40E0D0]/10 text-[#40E0D0] border border-[#40E0D0]/30"><Bot size={18}/> <span className="text-[10px] font-black tracking-widest uppercase">Neural Core</span></div>
@@ -380,14 +424,21 @@ const App = () => {
           </div>
         )}
 
+        {/* --- FOOTER --- */}
         <footer className="mt-48 border-t border-white/5 bg-black py-24 text-center relative">
             <div className="flex flex-col items-center gap-8">
-               <div className="p-8 rounded-[3rem] glass-luxury border border-[#40E0D0]/20"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-24 h-24 rounded-xl opacity-90" alt="QR" /></div>
+               <div className="flex items-center gap-6">
+                 {/* --- LOCATION 3: FOOTER CHARACTER --- */}
+                 {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Avatar" className="w-20 md:w-32 opacity-70 grayscale hover:grayscale-0 transition-all duration-700" />}
+                 
+                 <div className="p-8 rounded-[3rem] glass-luxury border border-[#40E0D0]/20"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-24 h-24 rounded-xl opacity-90" alt="QR" /></div>
+               </div>
                <div><h2 className="text-6xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2><p className="text-[#40E0D0] text-[10px] font-black tracking-[0.5em] uppercase mt-6">Core Architect & Director</p></div>
             </div>
         </footer>
       </div>
 
+      {/* --- MODALS --- */}
       {activeVideo && (
         <div className="fixed inset-0 z-[5000] bg-black/95 flex items-center justify-center p-4 backdrop-blur-xl" onContextMenu={(e) => e.preventDefault()}>
           <button onClick={() => { setActiveVideo(null); bgMusic.current.play(); }} className="absolute top-6 left-6 p-4 glass-luxury rounded-full hover:bg-white hover:text-black z-50"><X size={24}/></button>
