@@ -12,7 +12,7 @@ const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
 const GEMINI_API_KEY = ""; // 🔴 کلید جمینای خود را در صورت داشتن اینجا وارد کنید 🔴
 
 // --- ASSETS ---
-// ✅ لینک کاراکتر شما در اینجا قرار گرفت:
+// ✅ لینک کاراکتر شما (تست شده و سالم):
 const CHARACTER_IMG = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/Gemini_Generated_Image_gvynjogvynjogvyn-removebg.png"; 
 
 const GREETING_URL = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/ElevenLabs_2026-02-15T18_14_14_Donovan%20-%20Articulate,%20Strong%20and%20Deep_pvc_sp100_s50_sb75_v3.mp3"; 
@@ -106,6 +106,7 @@ const App = () => {
     bgMusic.current.volume = 0.4;
   }, [supabase]);
 
+  // --- ACTIONS ---
   const initializeProtocol = () => {
     setEntered(true);
     const playAudio = async () => {
@@ -214,35 +215,24 @@ const App = () => {
       <style dangerouslySetInnerHTML={{ __html: `
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,700&family=JetBrains+Mono:wght@300;700&display=swap');
         @font-face { font-family: 'Vazirmatn'; src: url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Medium.woff2') format('woff2'); }
-        
         body { font-family: 'Vazirmatn', sans-serif; background: #010101; }
         .font-serif { font-family: 'Cormorant Garamond', serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-
         .noise { position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.04; background-image: url('https://grainy-gradients.vercel.app/noise.svg'); }
-        
         .liquid-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
         .halo { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; animation: move 20s infinite alternate; }
         .silver { background: radial-gradient(circle, #b0b0b0 0%, transparent 70%); width: 80vw; height: 80vw; top: -20%; left: -20%; }
         .cyan-h { background: radial-gradient(circle, #40E0D0 0%, transparent 70%); width: 60vw; height: 60vw; bottom: -10%; right: -10%; animation-delay: -5s; }
         @keyframes move { from { transform: translate(0,0) rotate(0deg); } to { transform: translate(10%, 10%) rotate(10deg); } }
-
-        .halo-breathing { position: absolute; width: 140%; height: 140%; background: radial-gradient(circle, rgba(64,224,208,0.25) 0%, transparent 70%); animation: breathe 4s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 0.8; } }
-        
         .glass-luxury { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .responsive-title { font-size: clamp(3rem, 15vw, 13rem); line-height: 0.9; }
-        
         .snap-x { scroll-snap-type: x mandatory; }
         .snap-center { scroll-snap-align: center; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
         @keyframes bounce-right { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(5px); } }
         .animate-bounce-right { animation: bounce-right 1s infinite; }
-        
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
         .animate-float { animation: float 6s ease-in-out infinite; }
-        
         .silver-shine { background: linear-gradient(90deg, #fff 0%, #a0a0a0 50%, #fff 100%); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s infinite linear; }
         @keyframes shine { to { background-position: 200%; } }
       `}} />
@@ -250,17 +240,21 @@ const App = () => {
       <div className="noise" />
       <div className="liquid-bg"><div className="halo silver" /><div className="halo cyan-h" /></div>
 
+      {/* ✅ Preload Character Image for instant show ✅ */}
+      <img src={CHARACTER_IMG} alt="preload" className="hidden" fetchPriority="high" />
+
       {/* --- SPLASH SCREEN --- */}
       {!entered && (
         <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center cursor-pointer" onClick={initializeProtocol}>
-          <div className="relative flex flex-col items-center justify-center mb-12">
-            {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-40 md:w-56 mb-6 animate-float drop-shadow-[0_0_30px_rgba(64,224,208,0.3)] object-contain" />}
+          <div className="relative flex flex-col items-center justify-center mb-12 z-20">
+            {/* ✅ LOCATION 1: Fixed above PROMPT (Larger size) ✅ */}
+            <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-48 md:w-64 mb-4 animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain" />
             <div className="relative">
                <div className="halo-breathing" />
                <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)]">PROMPT</h1>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-zinc-400 text-[10px] md:text-xs tracking-[0.5em] uppercase font-mono bg-white/5 px-6 py-3 rounded-full border border-white/10">
+          <div className="flex items-center gap-4 text-zinc-400 text-[10px] md:text-xs tracking-[0.5em] uppercase font-mono bg-white/5 px-6 py-3 rounded-full border border-white/10 z-20">
             <MousePointer2 size={16} className="text-[#40E0D0] animate-bounce-right"/> <span>Initialize Sovereign Protocol</span>
           </div>
         </div>
@@ -279,17 +273,17 @@ const App = () => {
         </nav>
 
         <main className="max-w-[2000px] mx-auto px-4 md:px-8 py-32 md:py-48">
-          <header className="text-center mb-48 md:mb-80 relative">
+          <header className="text-center mb-32 md:mb-64 relative">
             <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
             
-            {/* --- CHARACTER IN MAIN BODY --- */}
-            <div className="flex justify-center -mt-10 md:-mt-20 relative z-10 pointer-events-none">
-               {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Avatar" className="w-32 md:w-56 opacity-80 animate-float object-contain drop-shadow-2xl" />}
+            {/* ✅ LOCATION 2: Fixed between Title and Archives (Using negative margin on desktop) ✅ */}
+            <div className="flex justify-center mt-10 md:-mt-24 relative z-10 pointer-events-none">
+               <img src={CHARACTER_IMG} alt="Avatar" className="w-40 md:w-72 opacity-90 animate-float object-contain drop-shadow-2xl" />
             </div>
           </header>
 
           {/* 1. ARCHIVES */}
-          <section className="mb-64 md:mb-96 relative group">
+          <section className="mb-64 md:mb-96 relative group pt-10 md:pt-0">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
                   <h2 className="text-5xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2">Archives</h2>
@@ -427,13 +421,14 @@ const App = () => {
         {/* --- FOOTER --- */}
         <footer className="mt-48 border-t border-white/5 bg-black py-24 text-center relative">
             <div className="flex flex-col items-center gap-8">
-               <div className="flex items-center gap-6">
-                 {/* --- LOCATION 3: FOOTER CHARACTER --- */}
-                 {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Avatar" className="w-20 md:w-32 opacity-70 grayscale hover:grayscale-0 transition-all duration-700" />}
+               <div className="flex items-center gap-6 md:gap-10">
+                 <div className="p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] glass-luxury border border-[#40E0D0]/20"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl opacity-90" alt="QR" /></div>
                  
-                 <div className="p-8 rounded-[3rem] glass-luxury border border-[#40E0D0]/20"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-24 h-24 rounded-xl opacity-90" alt="QR" /></div>
+                 {/* ✅ LOCATION 3: Fixed between QR and Text (Corrected Order) ✅ */}
+                 <img src={CHARACTER_IMG} alt="Avatar" className="w-24 md:w-40 opacity-80 grayscale hover:grayscale-0 transition-all duration-700 animate-float drop-shadow-lg" />
+                 
+                 <div><h2 className="text-5xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2><p className="text-[#40E0D0] text-[9px] md:text-[10px] font-black tracking-[0.5em] uppercase mt-4 md:mt-6">Core Architect & Director</p></div>
                </div>
-               <div><h2 className="text-6xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2><p className="text-[#40E0D0] text-[10px] font-black tracking-[0.5em] uppercase mt-6">Core Architect & Director</p></div>
             </div>
         </footer>
       </div>
