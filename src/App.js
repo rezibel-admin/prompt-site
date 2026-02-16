@@ -12,7 +12,7 @@ const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
 const GEMINI_API_KEY = ""; // 🔴 کلید جمینای خود را در صورت داشتن اینجا وارد کنید 🔴
 
 // --- ASSETS ---
-// ✅ لینک کاراکتر ثابت و تست شده:
+// ✅ لینک کاراکتر ثابت:
 const CHARACTER_IMG = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/Gemini_Generated_Image_gvynjogvynjogvyn-removebg.png"; 
 
 const GREETING_URL = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/ElevenLabs_2026-02-15T18_14_14_Donovan%20-%20Articulate,%20Strong%20and%20Deep_pvc_sp100_s50_sb75_v3.mp3"; 
@@ -236,16 +236,14 @@ const App = () => {
 
       <div className="noise" />
       <div className="liquid-bg"><div className="halo silver" /><div className="halo cyan-h" /></div>
-
-      {/* ✅ Preload Character for instant show ✅ */}
       <img src={CHARACTER_IMG} alt="preload" className="hidden" fetchPriority="high" />
 
       {/* --- SPLASH SCREEN --- */}
       {!entered && (
         <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center cursor-pointer" onClick={initializeProtocol}>
-          {/* ✅ LOCATION 1: Fixed - Touching PROMPT, scaled correctly ✅ */}
+          {/* ✅ LOCATION 1: Exact Placement on R-P of PROMPT ✅ */}
           <div className="relative flex flex-col items-center justify-center mb-12 z-20 leading-none">
-            {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-[25vw] md:w-[20vw] max-w-xs animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain -mb-[2vw] relative z-10" />}
+            {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-[35vw] md:w-[25vw] max-w-md animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain -mb-[3vw] md:-mb-[2.5vw] relative z-10" />}
             <div className="relative">
                <div className="halo-breathing" />
                <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)] leading-none">PROMPT</h1>
@@ -274,13 +272,13 @@ const App = () => {
             <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600 leading-none">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
           </header>
           
-          {/* ✅ LOCATION 2: Fixed - Independent Container between Header and Archives. Filling space luxuriously ✅ */}
-          <div className="flex justify-center my-16 md:my-24 relative z-10 pointer-events-none py-10">
-             <img src={CHARACTER_IMG} alt="Avatar" className="w-64 md:w-[30vw] max-w-2xl opacity-90 animate-float object-contain drop-shadow-2xl" />
+          {/* ✅ LOCATION 2: Larger & Luxurious Filling ✅ */}
+          <div className="flex justify-center my-10 md:my-16 relative z-10 pointer-events-none py-2">
+             <img src={CHARACTER_IMG} alt="Avatar" className="w-80 md:w-[40vw] max-w-[800px] opacity-90 animate-float object-contain drop-shadow-2xl" />
           </div>
 
           {/* 1. ARCHIVES */}
-          <section className="mb-64 md:mb-96 relative group">
+          <section className="mb-64 md:mb-96 relative group pt-10 md:pt-0">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
                   <h2 className="text-5xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2">Archives</h2>
@@ -421,8 +419,8 @@ const App = () => {
                <div className="flex items-center gap-6 md:gap-12">
                  <div className="p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] glass-luxury border border-[#40E0D0]/20"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl opacity-90" alt="QR" /></div>
                  
-                 {/* ✅ LOCATION 3: Fixed - Large & Luxurious between QR and Text ✅ */}
-                 <img src={CHARACTER_IMG} alt="Avatar" className="w-32 md:w-64 opacity-80 grayscale hover:grayscale-0 transition-all duration-700 animate-float drop-shadow-2xl" />
+                 {/* ✅ LOCATION 3: Massive Bridge between QR and Text ✅ */}
+                 <img src={CHARACTER_IMG} alt="Avatar" className="w-40 md:w-[30rem] max-w-full opacity-80 grayscale hover:grayscale-0 transition-all duration-700 animate-float drop-shadow-2xl" />
                  
                  <div><h2 className="text-5xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2><p className="text-[#40E0D0] text-[9px] md:text-[10px] font-black tracking-[0.5em] uppercase mt-4 md:mt-6">Core Architect & Director</p></div>
                </div>
