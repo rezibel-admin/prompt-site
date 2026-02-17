@@ -30,6 +30,37 @@ const formatPersianText = (text) => {
   });
 };
 
+// --- LUXURY COMPONENT: 3D TILT CARD ---
+const TiltCard = ({ children, className, onClick }) => {
+  const ref = useRef(null);
+  const [transform, setTransform] = useState('');
+
+  const onMouseMove = (e) => {
+    if (!ref.current) return;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const x = (e.clientX - left - width / 2) / 25; // Sensitivity
+    const y = (e.clientY - top - height / 2) / 25;
+    setTransform(`perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg) scale(1.02)`);
+  };
+
+  const onMouseLeave = () => {
+    setTransform('perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)');
+  };
+
+  return (
+    <div 
+      ref={ref} 
+      className={className} 
+      onMouseMove={onMouseMove} 
+      onMouseLeave={onMouseLeave} 
+      onClick={onClick}
+      style={{ transform, transition: 'transform 0.1s ease-out' }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const PRESET_PACKAGES = [
   { id: 'pkg_core', name: 'CORE', slogan: 'مهندسی حضورِ استاندارد برای برندهایی که اشتباه در شروع را نمی‌پذیرند.', price: '25', type: 'Core', details: ["خلق اثر شاخص سینمایی: تدوین خروجی بصری با استانداردهای نوری پیشرفته.","۵ فریم عکاسی تراز اول 4K (همراه با تجهیزات تخصصی نورپردازی!)","۴ اپیزود سنتز هوشمند بصری: بهره‌گیری از AI برای خلق ۱ انیمیشن مفهومی.","تلفیق ساختاری: ترکیب ویدیوهای رئال با لایه‌های بصری هوش مصنوعی.","معماری سناریو: تدوین استراتژیک سناریوهای روانشناختی.","مدیریت چرخه فروش: هدایت هوشمندانه مخاطب در مسیر خرید.","هویت‌بخشی بصری: معماری ویترین پیج و طراحی تمپلیت‌های اختصاصی."] },
   { id: 'pkg_fusion', name: 'FUSION', slogan: 'هم‌افزایی استراتژیک: نقطه تلاقی حاکمیتِ بصری و پردازش الگوریتمیک.', price: '45', type: 'Fusion', details: ["۴ خروجیِ ویدئوییِ شاخص: مهندسی ۴ ویدئوی حرفه‌ای (شامل FPV).","۱۰ فریم عکاسی صنعتی/تبلیغاتی: ایجاد یک آرشیو بصریِ غنی.","۸ محتوای سنتز شده: ۳ اپیزود انیمیشن سریالی + ۵ ویدئوی تبلیغاتی.","امضای بصری پویا: طراحی لوگوموشنی که هویت برند را حک می‌کند.","پروتکل سئو بصری: مهندسی کپشن برای اکسپلور.","مدیریت کامل ادمینی و فروش: واگذاری چرخه جذب به تیم متخصص."] },
@@ -70,7 +101,6 @@ const App = () => {
   const animScrollRef = useRef(null);
 
   useEffect(() => {
-    // --- Performance: Preconnect to external domains ---
     const link1 = document.createElement('link'); link1.rel = 'preconnect'; link1.href = 'https://bibgekufrjfokauiksca.supabase.co'; document.head.appendChild(link1);
     const link2 = document.createElement('link'); link2.rel = 'preconnect'; link2.href = 'https://generativelanguage.googleapis.com'; document.head.appendChild(link2);
     const link3 = document.createElement('link'); link3.rel = 'preconnect'; link3.href = 'https://prompt-cinematic-vault.s3.ir-thr-at1.arvanstorage.ir'; document.head.appendChild(link3);
@@ -243,8 +273,36 @@ const App = () => {
         .animate-bounce-right { animation: bounce-right 1s infinite; }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
         .animate-float { animation: float 6s ease-in-out infinite; }
-        .silver-shine { background: linear-gradient(90deg, #fff 0%, #a0a0a0 50%, #fff 100%); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s infinite linear; }
-        @keyframes shine { to { background-position: 200%; } }
+        
+        /* --- NEW LUXURY STYLES --- */
+        
+        /* 1. Holographic Border Animation */
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes rotate-border { to { --angle: 360deg; } }
+        .holo-card { position: relative; z-index: 1; border-radius: 4rem; overflow: hidden; }
+        .holo-card::before { content: ''; position: absolute; inset: -2px; border-radius: 4.2rem; padding: 2px; background: conic-gradient(from var(--angle), transparent 20%, #40E0D0, transparent 50%, #ffffff, transparent 80%); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: rotate-border 4s linear infinite; pointer-events: none; opacity: 0.6; }
+        .holo-card:hover::before { opacity: 1; filter: drop-shadow(0 0 10px rgba(64, 224, 208, 0.5)); }
+
+        /* 2. Glass Typography (Live Text) */
+        .glass-text { 
+           background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(160,160,160,0.6) 25%, rgba(255,255,255,0.9) 50%, rgba(160,160,160,0.6) 75%, rgba(255,255,255,0.9) 100%); 
+           background-size: 200% 200%; 
+           -webkit-background-clip: text; 
+           -webkit-text-fill-color: transparent; 
+           animation: shine-text 6s ease-in-out infinite;
+        }
+        @keyframes shine-text { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* 3. Neon Liquid Button */
+        .neon-btn { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; z-index: 10; }
+        .neon-btn::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background-color: #40E0D0; z-index: -2; }
+        .neon-btn::before { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 100%; background-color: #2abcb0; transition: all 0.4s; z-index: -1; }
+        .neon-btn:hover { color: black; box-shadow: 0 0 30px rgba(64, 224, 208, 0.6), 0 0 60px rgba(64, 224, 208, 0.3); transform: scale(1.02); }
+        .neon-btn:hover::before { width: 100%; }
+        
+        /* 4. Spotlight Group Logic */
+        .spotlight-group:hover .spotlight-item { opacity: 0.3; filter: grayscale(100%) blur(2px); transform: scale(0.95); transition: all 0.5s ease; }
+        .spotlight-group .spotlight-item:hover { opacity: 1 !important; filter: grayscale(0%) blur(0px) !important; transform: scale(1.05) !important; z-index: 10; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.8); }
       `}} />
 
       <div className="noise" />
@@ -259,7 +317,7 @@ const App = () => {
             <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-[45vw] md:w-[22vw] max-w-md animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain mb-6 md:-mb-[2.5vw] relative z-10" />
             <div className="relative">
                <div className="halo-breathing" />
-               <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)] leading-none">PROMPT</h1>
+               <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)] leading-none glass-text">PROMPT</h1>
             </div>
           </div>
           <div className="flex items-center gap-4 text-zinc-400 text-[10px] md:text-xs tracking-[0.5em] uppercase font-mono bg-white/5 px-6 py-3 rounded-full border border-white/10 z-20">
@@ -282,28 +340,27 @@ const App = () => {
 
         <main className="max-w-[2000px] mx-auto px-4 md:px-8 py-32 md:py-48">
           <header className="text-center relative">
-            <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600 leading-none">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
+            <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic glass-text leading-none">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
           </header>
           
           <div className="flex justify-center my-12 md:my-16 relative z-10 pointer-events-none py-2">
              <img src={CHARACTER_IMG} alt="Avatar" className="w-[60vw] md:w-[35vw] max-w-[700px] opacity-90 animate-float object-contain drop-shadow-2xl" />
           </div>
 
-          {/* 1. ARCHIVES */}
-          <section className="mb-64 md:mb-96 relative group pt-10 md:pt-0">
+          {/* 1. ARCHIVES (Spotlight Cinema) */}
+          <section className="mb-64 md:mb-96 relative pt-10 md:pt-0">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
-                  <h2 className="text-5xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2">Archives</h2>
+                  <h2 className="text-5xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2 glass-text">Archives</h2>
                   <p className="text-[#40E0D0] text-xs md:text-base font-[Vazirmatn] font-bold opacity-80">آرشیو پروژه‌های شاخص و سینمایی</p>
                </div>
             </div>
             
-            <div ref={scrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4 scroll-smooth">
+            <div ref={scrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4 scroll-smooth spotlight-group">
               {portfolio.filter(p => p.type !== 'animation').map((item) => (
-                <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95 group">
+                <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl spotlight-item group">
                   <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                    {/* Lazy Loading & Async Decoding for speed */}
-                    <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" decoding="async" />
+                    <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" decoding="async" />
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                       <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                       <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -313,7 +370,6 @@ const App = () => {
               ))}
             </div>
             
-            {/* Mobile Nav */}
             <div className="flex justify-between items-center px-4 mt-4 md:hidden opacity-60">
                <button onClick={() => scrollVault(scrollRef, 'left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
                <span className="text-[9px] tracking-[0.3em] uppercase font-mono">Swipe or Tap to Explore</span>
@@ -321,20 +377,20 @@ const App = () => {
             </div>
           </section>
 
-          {/* NEURAL ANIMATIONS */}
+          {/* NEURAL ANIMATIONS (Spotlight Cinema) */}
           <section className="mb-64 md:mb-96 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
-                  <h2 className="text-4xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2">Neural Animations</h2>
+                  <h2 className="text-4xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2 glass-text">Neural Animations</h2>
                   <p className="text-[#40E0D0] text-xs md:text-base font-[Vazirmatn] font-bold opacity-80">آرشیو انیمیشن‌ها</p>
                </div>
             </div>
-            <div ref={animScrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4 scroll-smooth">
+            <div ref={animScrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4 scroll-smooth spotlight-group">
                {portfolio.filter(p => p.type === 'animation').length > 0 ? (
                  portfolio.filter(p => p.type === 'animation').map((item) => (
-                    <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95 group">
+                    <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl spotlight-item group">
                       <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                        <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" decoding="async" />
+                        <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" decoding="async" />
                         <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                           <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                           <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -357,15 +413,15 @@ const App = () => {
             </div>
           </section>
 
-          {/* 2. PROPOSALS */}
+          {/* 2. PROPOSALS (Holographic Borders + Tilt) */}
           <section className="mb-64 md:mb-96">
              <div className="text-center mb-24 md:mb-40 px-4">
-               <h2 className="text-5xl md:text-9xl font-black uppercase tracking-tighter mb-4 italic font-serif">Proposals</h2>
+               <h2 className="text-5xl md:text-9xl font-black uppercase tracking-tighter mb-4 italic font-serif glass-text">Proposals</h2>
                <p className="text-[#40E0D0] text-sm md:text-xl font-[Vazirmatn] font-bold">پروتکل‌های همکاری استراتژیک و تعرفه‌ها</p>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
                 {PRESET_PACKAGES.map(pkg => (
-                  <div key={pkg.id} onClick={() => setPreviewPackage(pkg)} className={`p-8 md:p-12 rounded-[3rem] md:rounded-[4rem] min-h-[500px] flex flex-col justify-between cursor-pointer border border-white/5 glass-luxury active:scale-95 transition-all ${pkg.type === 'Fusion' ? 'border-[#40E0D0]/30 shadow-[0_0_40px_rgba(64,224,208,0.05)]' : ''}`}>
+                  <TiltCard key={pkg.id} onClick={() => setPreviewPackage(pkg)} className={`p-8 md:p-12 rounded-[3rem] md:rounded-[4rem] min-h-[500px] flex flex-col justify-between cursor-pointer border border-white/5 glass-luxury active:scale-95 transition-all holo-card`}>
                       <div>
                         <div className="mb-8 p-6 rounded-[2rem] inline-block bg-white/5 text-[#40E0D0]">{pkg.type === 'Quantum' ? <Gem size={32}/> : pkg.type === 'Fusion' ? <Atom size={32}/> : <Cpu size={32}/>}</div>
                         <h3 className="text-4xl md:text-5xl font-black mb-3 italic uppercase font-serif">{pkg.name}</h3>
@@ -373,21 +429,21 @@ const App = () => {
                         <div className="text-3xl md:text-4xl font-black font-mono">{pkg.price} <span className="text-[10px] text-zinc-500">M T</span></div>
                       </div>
                       <div className="mt-8 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] opacity-50 font-mono">View Specs <Plus size={14}/></div>
-                  </div>
+                  </TiltCard>
                 ))}
              </div>
           </section>
 
-          {/* 3. NEURAL GRID */}
+          {/* 3. NEURAL GRID (3D Tilt + Neon Buttons) */}
           <section className="mb-64">
             <div className="text-center mb-24 md:mb-32 px-4">
                <div className="inline-flex items-center gap-3 mb-6 px-5 py-2 rounded-full bg-[#40E0D0]/10 text-[#40E0D0] border border-[#40E0D0]/30"><Bot size={18}/> <span className="text-[10px] font-black tracking-widest uppercase">Neural Core</span></div>
-               <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-4 italic font-serif">Neural Grid</h2>
+               <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-4 italic font-serif glass-text">Neural Grid</h2>
                <p className="text-zinc-500 tracking-[0.2em] uppercase text-[10px] font-black">ابزارهای هوشمند / Intelligence Modules</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
               {NEURAL_MODULES.map((module) => (
-                <div key={module.id} className="p-8 md:p-10 rounded-[3rem] border border-white/5 glass-luxury flex flex-col h-[550px] relative overflow-hidden group shadow-2xl z-10">
+                <TiltCard key={module.id} className="p-8 md:p-10 rounded-[3rem] border border-white/5 glass-luxury flex flex-col h-[550px] relative overflow-hidden shadow-2xl z-10">
                   <div className="absolute top-8 right-8 px-4 py-1.5 rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] text-[8px] font-black tracking-widest italic shadow-lg">FREE: {quotas[module.id] || 0}/{module.limit}</div>
                   <div className="mt-8 mb-6 text-[#40E0D0] bg-white/5 p-5 rounded-[2rem] w-fit shadow-lg">{module.icon}</div>
                   <h3 className="text-2xl font-black text-white uppercase italic tracking-tight mb-2">{module.title}</h3>
@@ -400,12 +456,12 @@ const App = () => {
                       className="w-full bg-black/60 border border-white/10 p-4 rounded-[1.5rem] text-right text-xs text-white outline-none focus:border-[#40E0D0] h-24 resize-none transition-all placeholder:opacity-30" 
                       placeholder="درخواست خود را وارد کنید..."
                     />
-                    <button onClick={() => handleAiExecute(module)} className="w-full py-4 bg-white text-black font-black text-[10px] tracking-[0.3em] rounded-[1.5rem] hover:bg-[#40E0D0] transition-all uppercase shadow-lg active:scale-95">
+                    <button onClick={() => handleAiExecute(module)} className="w-full py-4 bg-white text-black font-black text-[10px] tracking-[0.3em] rounded-[1.5rem] neon-btn uppercase shadow-lg active:scale-95">
                       {isAiLoading[module.id] ? <RefreshCw className="animate-spin mx-auto" size={16}/> : 'Execute'}
                     </button>
                   </div>
                   {aiResults[module.id] && (
-                    <div className="absolute inset-0 z-30 bg-black/98 rounded-[3rem] p-8 flex flex-col animate-in fade-in zoom-in duration-300">
+                    <div className="absolute inset-0 z-30 bg-black/98 rounded-[3rem] p-8 flex flex-col animate-in fade-in zoom-in duration-300" onMouseMove={e => e.stopPropagation()}>
                       <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
                         <span className="text-[#40E0D0] text-[9px] font-black font-mono tracking-widest">OUTPUT</span>
                         <button onClick={() => setAiResults({...aiResults, [module.id]: null})}><X size={20} className="text-zinc-500"/></button>
@@ -424,13 +480,13 @@ const App = () => {
                       </div>
                     </div>
                   )}
-                </div>
+                </TiltCard>
               ))}
             </div>
           </section>
         </main>
 
-        <button onClick={() => setShowChat(true)} className="fixed bottom-6 left-6 p-5 bg-[#40E0D0] text-black rounded-full shadow-[0_0_30px_rgba(64,224,208,0.4)] z-[200] active:scale-90 transition-all">
+        <button onClick={() => setShowChat(true)} className="fixed bottom-6 left-6 p-5 bg-[#40E0D0] text-black rounded-full shadow-[0_0_30px_rgba(64,224,208,0.4)] z-[200] active:scale-90 transition-all neon-btn">
           <MessageSquare size={24} />
         </button>
 
