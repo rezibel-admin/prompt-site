@@ -8,6 +8,7 @@ import {
 // --- CONFIG & CREDENTIALS ---
 const supabaseUrl = 'https://bibgekufrjfokauiksca.supabase.co';
 const supabaseKey = 'sb_publishable_7VSrrcDIUHhZaRgUPsEwkw_jfLxxVdc';
+// ⚠️ حساس به حروف بزرگ و کوچک (دقیق وارد کنید)
 const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
 
 // ✅ کلید فعال‌سازی مغز سایت:
@@ -131,11 +132,11 @@ const App = () => {
     }
   };
 
-  const scrollVault = (direction) => {
-    if (scrollRef.current) {
-        const { scrollLeft, clientWidth } = scrollRef.current;
+  const scrollVault = (ref, direction) => {
+    if (ref.current) {
+        const { scrollLeft, clientWidth } = ref.current;
         const step = clientWidth * 0.7;
-        scrollRef.current.scrollTo({ left: direction === 'left' ? scrollLeft - step : scrollLeft + step, behavior: 'smooth' });
+        ref.current.scrollTo({ left: direction === 'left' ? scrollLeft - step : scrollLeft + step, behavior: 'smooth' });
     }
   };
 
@@ -179,7 +180,7 @@ const App = () => {
         const seed = Math.floor(Math.random() * 99999);
         const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(input)}?width=1024&height=1024&seed=${seed}&nologo=true`;
         
-        // Preload image to ensure it's generated
+        // Preload
         const img = new Image();
         img.src = imageUrl;
         img.onload = () => {
@@ -262,14 +263,12 @@ const App = () => {
       <div className="noise" />
       <div className="liquid-bg"><div className="halo silver" /><div className="halo cyan-h" /></div>
 
-      {/* ✅ Turbo Preload for Instant Display ✅ */}
       <img src={CHARACTER_IMG} alt="preload" className="hidden" fetchPriority="high" decoding="async" />
 
       {/* --- SPLASH SCREEN --- */}
       {!entered && (
         <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center cursor-pointer" onClick={initializeProtocol}>
           <div className="relative flex flex-col items-center justify-center mb-12 z-20 leading-none">
-            {/* ✅ FIXED: Mobile (NO Overlap with mb-6) vs Desktop (Overlap with -mb-[2.5vw]) ✅ */}
             <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-[45vw] md:w-[22vw] max-w-md animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain mb-6 md:-mb-[2.5vw] relative z-10" />
             <div className="relative">
                <div className="halo-breathing" />
@@ -299,7 +298,6 @@ const App = () => {
             <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600 leading-none">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
           </header>
           
-          {/* ✅ FIXED: Larger Size & Better Filling for PC & Mobile ✅ */}
           <div className="flex justify-center my-12 md:my-16 relative z-10 pointer-events-none py-2">
              <img src={CHARACTER_IMG} alt="Avatar" className="w-[60vw] md:w-[35vw] max-w-[700px] opacity-90 animate-float object-contain drop-shadow-2xl" />
           </div>
@@ -315,9 +313,9 @@ const App = () => {
             
             <div ref={scrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4 scroll-smooth">
               {portfolio.filter(p => p.type !== 'animation').map((item) => (
-                <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95">
+                <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95 group">
                   <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                    <img src={item.cover_url} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
+                    <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                       <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                       <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -327,11 +325,11 @@ const App = () => {
               ))}
             </div>
             
-            {/* Mobile Nav */}
+            {/* Mobile Nav - Archives */}
             <div className="flex justify-between items-center px-4 mt-4 md:hidden opacity-60">
-               <button onClick={() => scrollVault('left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
+               <button onClick={() => scrollVault(scrollRef, 'left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
                <span className="text-[9px] tracking-[0.3em] uppercase font-mono">Swipe or Tap to Explore</span>
-               <button onClick={() => scrollVault('right')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronRight size={24}/></button>
+               <button onClick={() => scrollVault(scrollRef, 'right')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronRight size={24}/></button>
             </div>
           </section>
 
@@ -340,15 +338,15 @@ const App = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
                   <h2 className="text-4xl md:text-8xl font-black tracking-tight uppercase italic font-serif leading-none mb-2">Neural Animations</h2>
-                  <p className="text-[#40E0D0] text-xs md:text-base font-[Vazirmatn] font-bold opacity-80">سنتز انیمیشن‌های مفهومی و عصبی</p>
+                  <p className="text-[#40E0D0] text-xs md:text-base font-[Vazirmatn] font-bold opacity-80">آرشیو انیمیشن‌ها</p>
                </div>
             </div>
-            <div ref={animScrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4">
+            <div ref={animScrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4 scroll-smooth">
                {portfolio.filter(p => p.type === 'animation').length > 0 ? (
                  portfolio.filter(p => p.type === 'animation').map((item) => (
-                    <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95">
+                    <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95 group">
                       <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                        <img src={item.cover_url} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
+                        <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
                         <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                           <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                           <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -362,6 +360,13 @@ const App = () => {
                    <span className="font-mono text-zinc-500 text-[10px] tracking-widest">ANIMATION VAULT LOADING...</span>
                  </div>
                )}
+            </div>
+
+            {/* Mobile Nav - Animations */}
+            <div className="flex justify-between items-center px-4 mt-4 md:hidden opacity-60">
+               <button onClick={() => scrollVault(animScrollRef, 'left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
+               <span className="text-[9px] tracking-[0.3em] uppercase font-mono">Swipe or Tap to Explore</span>
+               <button onClick={() => scrollVault(animScrollRef, 'right')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronRight size={24}/></button>
             </div>
           </section>
 
