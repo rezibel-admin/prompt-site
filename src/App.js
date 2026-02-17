@@ -9,12 +9,12 @@ import {
 const supabaseUrl = 'https://bibgekufrjfokauiksca.supabase.co';
 const supabaseKey = 'sb_publishable_7VSrrcDIUHhZaRgUPsEwkw_jfLxxVdc';
 const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
-const GEMINI_API_KEY = ""; // 🔴 کلید جمینای خود را در صورت داشتن اینجا وارد کنید 🔴
+
+// ✅ کلید فعال‌سازی مغز سایت:
+const GEMINI_API_KEY = "AIzaSyCrFt7BZv4hlZROlo6gVYw61CytZTdYlF8"; 
 
 // --- ASSETS ---
-// ✅ لینک کاراکتر ثابت:
 const CHARACTER_IMG = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/Gemini_Generated_Image_gvynjogvynjogvyn-removebg.png"; 
-
 const GREETING_URL = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/ElevenLabs_2026-02-15T18_14_14_Donovan%20-%20Articulate,%20Strong%20and%20Deep_pvc_sp100_s50_sb75_v3.mp3"; 
 const BG_MUSIC_URL = "https://bibgekufrjfokauiksca.supabase.co/storage/v1/object/public/audio/starostin-ambient-ambient-music-484374.mp3";
 
@@ -57,6 +57,8 @@ const App = () => {
   const [videoLoading, setVideoLoading] = useState(true);
   const [newProject, setNewProject] = useState({ title: '', video_url: '', cover_url: '', type: 'video' });
   const [quotas, setQuotas] = useState({});
+  
+  // AI Chat States
   const [showChat, setShowChat] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatLog, setChatLog] = useState([{ role: 'bot', text: "درود بر شما. من هوش مصنوعی پروتکل Sovereign هستم. چطور می‌توانم در مسیر حاکمیت بصری به شما کمک کنم؟" }]);
@@ -104,6 +106,7 @@ const App = () => {
     bgMusic.current.volume = 0.4;
   }, [supabase]);
 
+  // --- ACTIONS ---
   const initializeProtocol = () => {
     setEntered(true);
     const playAudio = async () => {
@@ -236,14 +239,16 @@ const App = () => {
 
       <div className="noise" />
       <div className="liquid-bg"><div className="halo silver" /><div className="halo cyan-h" /></div>
-      <img src={CHARACTER_IMG} alt="preload" className="hidden" fetchPriority="high" />
+
+      {/* ✅ Turbo Preload for Instant Display ✅ */}
+      <img src={CHARACTER_IMG} alt="preload" className="hidden" fetchPriority="high" decoding="async" />
 
       {/* --- SPLASH SCREEN --- */}
       {!entered && (
         <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 text-center cursor-pointer" onClick={initializeProtocol}>
-          {/* ✅ LOCATION 1: Exact Placement on R-P of PROMPT ✅ */}
           <div className="relative flex flex-col items-center justify-center mb-12 z-20 leading-none">
-            {CHARACTER_IMG && <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-[35vw] md:w-[25vw] max-w-md animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain -mb-[3vw] md:-mb-[2.5vw] relative z-10" />}
+            {/* ✅ FIXED: Mobile (NO Overlap with mb-6) vs Desktop (Overlap with -mb-[2.5vw]) ✅ */}
+            <img src={CHARACTER_IMG} alt="Sovereign Avatar" className="w-[45vw] md:w-[22vw] max-w-md animate-float drop-shadow-[0_0_40px_rgba(64,224,208,0.4)] object-contain mb-6 md:-mb-[2.5vw] relative z-10" />
             <div className="relative">
                <div className="halo-breathing" />
                <h1 className="text-[18vw] md:text-[12rem] font-black tracking-tighter text-white italic z-10 drop-shadow-[0_0_30px_rgba(64,224,208,0.5)] leading-none">PROMPT</h1>
@@ -272,9 +277,9 @@ const App = () => {
             <h1 className="responsive-title font-black tracking-tighter uppercase select-none italic text-transparent bg-clip-text bg-gradient-to-br from-white via-zinc-200 to-zinc-600 leading-none">VISUAL <br /> <span className="text-[#40E0D0]">SUPREMACY</span></h1>
           </header>
           
-          {/* ✅ LOCATION 2: Larger & Luxurious Filling ✅ */}
-          <div className="flex justify-center my-10 md:my-16 relative z-10 pointer-events-none py-2">
-             <img src={CHARACTER_IMG} alt="Avatar" className="w-80 md:w-[40vw] max-w-[800px] opacity-90 animate-float object-contain drop-shadow-2xl" />
+          {/* ✅ FIXED: Larger Size & Better Filling for PC & Mobile ✅ */}
+          <div className="flex justify-center my-12 md:my-16 relative z-10 pointer-events-none py-2">
+             <img src={CHARACTER_IMG} alt="Avatar" className="w-[60vw] md:w-[35vw] max-w-[700px] opacity-90 animate-float object-contain drop-shadow-2xl" />
           </div>
 
           {/* 1. ARCHIVES */}
@@ -290,7 +295,7 @@ const App = () => {
               {portfolio.filter(p => p.type !== 'animation').map((item) => (
                 <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95">
                   <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                    <img src={item.cover_url} className="w-full h-full object-cover opacity-70" alt={item.title}/>
+                    <img src={item.cover_url} className="w-full h-full object-cover opacity-70" alt={item.title} loading="lazy" />
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                       <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                       <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -413,16 +418,23 @@ const App = () => {
           </div>
         )}
 
-        {/* --- FOOTER --- */}
+        {/* --- FOOTER (MOBILE FIXED) --- */}
         <footer className="mt-48 border-t border-white/5 bg-black py-24 text-center relative">
-            <div className="flex flex-col items-center gap-8">
-               <div className="flex items-center gap-6 md:gap-12">
-                 <div className="p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] glass-luxury border border-[#40E0D0]/20"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl opacity-90" alt="QR" /></div>
+            <div className="flex flex-col items-center">
+               <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                 {/* 1. REZIBEL Text (Top on Mobile) */}
+                 <div className="order-1 md:order-3">
+                    <h2 className="text-6xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2>
+                    <p className="text-[#40E0D0] text-[10px] font-black tracking-[0.5em] uppercase mt-4 md:mt-6">Core Architect & Director</p>
+                 </div>
                  
-                 {/* ✅ LOCATION 3: Massive Bridge between QR and Text ✅ */}
-                 <img src={CHARACTER_IMG} alt="Avatar" className="w-40 md:w-[30rem] max-w-full opacity-80 grayscale hover:grayscale-0 transition-all duration-700 animate-float drop-shadow-2xl" />
+                 {/* 2. CHARACTER (Middle) */}
+                 <img src={CHARACTER_IMG} alt="Avatar" className="order-2 w-28 md:w-48 opacity-80 grayscale hover:grayscale-0 transition-all duration-700 animate-float drop-shadow-xl" />
                  
-                 <div><h2 className="text-5xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2><p className="text-[#40E0D0] text-[9px] md:text-[10px] font-black tracking-[0.5em] uppercase mt-4 md:mt-6">Core Architect & Director</p></div>
+                 {/* 3. QR CODE (Bottom on Mobile) */}
+                 <div className="order-3 md:order-1 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] glass-luxury border border-[#40E0D0]/20">
+                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl opacity-90" alt="QR" />
+                 </div>
                </div>
             </div>
         </footer>
