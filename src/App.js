@@ -2,16 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, Trash2, X, Lock, LogOut, Crown, RefreshCw, Cpu, Atom, Gem, Briefcase, 
   Plus, CheckCircle2, ArrowUp, ArrowDown, Save, QrCode, Image as ImageIcon, 
-  MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX, ChevronRight, ChevronLeft, MousePointer2, Send, Download
+  MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX, ChevronRight, ChevronLeft, MousePointer2, Send, Download, AlertTriangle
 } from 'lucide-react';
 
 // --- CONFIG & CREDENTIALS ---
 const supabaseUrl = 'https://bibgekufrjfokauiksca.supabase.co';
 const supabaseKey = 'sb_publishable_7VSrrcDIUHhZaRgUPsEwkw_jfLxxVdc';
-// ⚠️ حساس به حروف بزرگ و کوچک (دقیق وارد کنید)
 const ADMIN_CREDENTIALS = { user: "RezibelRr845", pass: "RezaRezibel13845" };
 
-// ✅ کلید فعال‌سازی مغز سایت:
+// ✅ کلید فعال‌سازی:
 const GEMINI_API_KEY = "AIzaSyCrFt7BZv4hlZROlo6gVYw61CytZTdYlF8"; 
 
 // --- ASSETS ---
@@ -56,10 +55,7 @@ const App = () => {
   const [supabase, setSupabase] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
-  const [newProject, setNewProject] = useState({ title: '', video_url: '', cover_url: '', type: 'video' });
   const [quotas, setQuotas] = useState({});
-  
-  // AI Chat States
   const [showChat, setShowChat] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatLog, setChatLog] = useState([{ role: 'bot', text: "درود بر شما. من هوش مصنوعی پروتکل Sovereign هستم. چطور می‌توانم در مسیر حاکمیت بصری به شما کمک کنم؟" }]);
@@ -74,6 +70,11 @@ const App = () => {
   const animScrollRef = useRef(null);
 
   useEffect(() => {
+    // --- Performance: Preconnect to external domains ---
+    const link1 = document.createElement('link'); link1.rel = 'preconnect'; link1.href = 'https://bibgekufrjfokauiksca.supabase.co'; document.head.appendChild(link1);
+    const link2 = document.createElement('link'); link2.rel = 'preconnect'; link2.href = 'https://generativelanguage.googleapis.com'; document.head.appendChild(link2);
+    const link3 = document.createElement('link'); link3.rel = 'preconnect'; link3.href = 'https://prompt-cinematic-vault.s3.ir-thr-at1.arvanstorage.ir'; document.head.appendChild(link3);
+
     if (!window.supabase) {
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
@@ -107,7 +108,6 @@ const App = () => {
     bgMusic.current.volume = 0.4;
   }, [supabase]);
 
-  // --- ACTIONS ---
   const initializeProtocol = () => {
     setEntered(true);
     const playAudio = async () => {
@@ -115,7 +115,7 @@ const App = () => {
         await greeting.current.play();
         await bgMusic.current.play();
       } catch (e) {
-        console.log("Auto-play blocked by browser policy, waiting for user interaction");
+        console.log("Auto-play waiting for user interaction");
       }
     };
     playAudio();
@@ -155,12 +155,12 @@ const App = () => {
           contents: [{ parts: [{ text: `Act as the Sovereign AI Assistant for REZIBEL PROMPT. Respond in Persian. Tone: Professional, Cinematic, Luxury. Question: ${chatInput}` }] }]
         })
       });
-      if (!response.ok) throw new Error("Network response was not ok");
+      if (!response.ok) throw new Error("API_ERROR");
       const data = await response.json();
       const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "خطا در دریافت پاسخ.";
       setChatLog(prev => [...prev, { role: 'bot', text: botText }]);
     } catch (e) {
-      setChatLog(prev => [...prev, { role: 'bot', text: "ارتباط با هسته مرکزی برقرار نشد. لطفاً اتصال (VPN) خود را بررسی کنید." }]);
+      setChatLog(prev => [...prev, { role: 'bot', text: "ارتباط با سرور هوش مصنوعی برقرار نشد. لطفاً اتصال اینترنت و VPN خود را بررسی کنید." }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -180,16 +180,13 @@ const App = () => {
         const seed = Math.floor(Math.random() * 99999);
         const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(input)}?width=1024&height=1024&seed=${seed}&nologo=true`;
         
-        // Preload
         const img = new Image();
         img.src = imageUrl;
         img.onload = () => {
             setAiResults(prev => ({ ...prev, [module.id]: imageUrl }));
             setIsAiLoading(prev => ({ ...prev, [module.id]: false }));
         };
-        img.onerror = () => {
-            throw new Error("Image generation failed");
-        };
+        img.onerror = () => { throw new Error("Image Load Failed"); };
 
       } else {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
@@ -197,7 +194,7 @@ const App = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: `Respond in Persian. Creative Director tone. Prompt: ${input}` }] }] })
         });
-        if (!response.ok) throw new Error("Network error");
+        if (!response.ok) throw new Error("API_ERROR");
         const data = await response.json();
         setAiResults(prev => ({ ...prev, [module.id]: data.candidates[0].content.parts[0].text }));
         setIsAiLoading(prev => ({ ...prev, [module.id]: false }));
@@ -209,7 +206,7 @@ const App = () => {
         localStorage.setItem('neural_quotas', JSON.stringify({ date: new Date().toDateString(), usage: newQuotas }));
       }
     } catch (e) {
-      alert("ارتباط با هسته هوش مصنوعی برقرار نشد. لطفاً اتصال اینترنت و فیلترشکن خود را بررسی کنید.");
+      alert("خطا: ارتباط با سرور برقرار نشد. لطفاً VPN خود را روشن کنید.");
       setIsAiLoading(prev => ({ ...prev, [module.id]: false }));
     }
   };
@@ -221,16 +218,6 @@ const App = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const addArchive = async () => {
-    if (!isAdmin || !newProject.video_url) return;
-    const { error } = await supabase.from('archives').insert([{ ...newProject, order_index: Date.now() }]);
-    if (!error) {
-        const { data } = await supabase.from('archives').select('*').order('order_index', { ascending: true });
-        setPortfolio(data);
-        setNewProject({ title: '', video_url: '', cover_url: '', type: 'video' });
-    }
   };
 
   return (
@@ -315,7 +302,8 @@ const App = () => {
               {portfolio.filter(p => p.type !== 'animation').map((item) => (
                 <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95 group">
                   <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                    <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
+                    {/* Lazy Loading & Async Decoding for speed */}
+                    <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" decoding="async" />
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                       <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                       <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -325,7 +313,7 @@ const App = () => {
               ))}
             </div>
             
-            {/* Mobile Nav - Archives */}
+            {/* Mobile Nav */}
             <div className="flex justify-between items-center px-4 mt-4 md:hidden opacity-60">
                <button onClick={() => scrollVault(scrollRef, 'left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
                <span className="text-[9px] tracking-[0.3em] uppercase font-mono">Swipe or Tap to Explore</span>
@@ -333,7 +321,7 @@ const App = () => {
             </div>
           </section>
 
-          {/* NEURAL ANIMATIONS (ACTIVATED) */}
+          {/* NEURAL ANIMATIONS */}
           <section className="mb-64 md:mb-96 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
@@ -346,7 +334,7 @@ const App = () => {
                  portfolio.filter(p => p.type === 'animation').map((item) => (
                     <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95 group">
                       <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                        <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
+                        <img src={item.cover_url} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" decoding="async" />
                         <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                           <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                           <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -362,7 +350,6 @@ const App = () => {
                )}
             </div>
 
-            {/* Mobile Nav - Animations */}
             <div className="flex justify-between items-center px-4 mt-4 md:hidden opacity-60">
                <button onClick={() => scrollVault(animScrollRef, 'left')} className="p-3 glass-luxury rounded-full text-[#40E0D0] active:scale-90 transition-transform"><ChevronLeft size={24}/></button>
                <span className="text-[9px] tracking-[0.3em] uppercase font-mono">Swipe or Tap to Explore</span>
@@ -472,16 +459,11 @@ const App = () => {
         <footer className="mt-48 border-t border-white/5 bg-black py-24 text-center relative">
             <div className="flex flex-col items-center">
                <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-                 {/* 1. REZIBEL Text (Top on Mobile) */}
                  <div className="order-1 md:order-3">
                     <h2 className="text-6xl md:text-9xl font-black leading-none tracking-tighter italic select-none silver-shine">REZIBEL</h2>
                     <p className="text-[#40E0D0] text-[10px] font-black tracking-[0.5em] uppercase mt-4 md:mt-6">Core Architect & Director</p>
                  </div>
-                 
-                 {/* 2. CHARACTER (Middle) */}
                  <img src={CHARACTER_IMG} alt="Avatar" className="order-2 w-28 md:w-48 opacity-80 grayscale hover:grayscale-0 transition-all duration-700 animate-float drop-shadow-xl" />
-                 
-                 {/* 3. QR CODE (Bottom on Mobile) */}
                  <div className="order-3 md:order-1 p-6 md:p-8 rounded-[2rem] md:rounded-[3rem] glass-luxury border border-[#40E0D0]/20">
                     <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&color=40E0D0&bgcolor=000&margin=2`} className="w-20 h-20 md:w-24 md:h-24 rounded-xl opacity-90" alt="QR" />
                  </div>
@@ -496,7 +478,17 @@ const App = () => {
           <button onClick={() => { setActiveVideo(null); bgMusic.current.play(); }} className="absolute top-6 left-6 p-4 glass-luxury rounded-full hover:bg-white hover:text-black z-50"><X size={24}/></button>
           <div className="w-full max-w-md aspect-[9/16] rounded-[3rem] overflow-hidden border border-[#40E0D0]/30 shadow-2xl relative bg-black">
             {videoLoading && <div className="absolute inset-0 flex items-center justify-center"><Loader2 className="animate-spin text-[#40E0D0]" size={40}/></div>}
-            <video controls autoPlay className="w-full h-full object-cover" controlsList="nodownload" poster={activeVideo.cover_url} onLoadedData={() => setVideoLoading(false)}><source src={activeVideo.video_url} type="video/mp4" /></video>
+            <video 
+              controls 
+              autoPlay 
+              playsInline 
+              className="w-full h-full object-cover" 
+              controlsList="nodownload" 
+              poster={activeVideo.cover_url} 
+              onLoadedData={() => setVideoLoading(false)}
+            >
+              <source src={activeVideo.video_url} type="video/mp4" />
+            </video>
           </div>
         </div>
       )}
