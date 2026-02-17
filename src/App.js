@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Play, Trash2, X, Lock, LogOut, Crown, RefreshCw, Cpu, Atom, Gem, Briefcase, 
   Plus, CheckCircle2, ArrowUp, ArrowDown, Save, QrCode, Image as ImageIcon, 
-  MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX, ChevronRight, ChevronLeft, MousePointer2, Send
+  MessageSquare, Target, Wand2, Bot, Zap, Loader2, Volume2, VolumeX, ChevronRight, ChevronLeft, MousePointer2, Send, Download
 } from 'lucide-react';
 
 // --- CONFIG & CREDENTIALS ---
@@ -39,7 +39,7 @@ const PRESET_PACKAGES = [
 
 const NEURAL_MODULES = [
   { id: 'visual_engine', title: 'Visual Engine', fa_title: 'موتور تصویرسازی هوشمند', limit: 5, icon: <ImageIcon size={28}/>, type: 'image', desc: 'توصیف صحنه را بنویسید تا هوش مصنوعی آن را به تصویر تبدیل کند.' },
-  { id: 'quantum_script', title: 'Quantum Script', fa_title: 'مهندسی سناریوهای ویروسی', limit: 3, icon: <MessageSquare size={28}/>, type: 'text', desc: 'موضوع محصول را بنویسید تا سناریوی ویروسی دریافت کنید.' },
+  { id: 'quantum_script', title: 'Quantum Script', fa_title: 'مهندسی سناریوهای جریان‌ساز', limit: 3, icon: <MessageSquare size={28}/>, type: 'text', desc: 'موضوع محصول را بنویسید تا سناریوی سینمایی و جریان‌ساز دریافت کنید.' },
   { id: 'oracle', title: 'Oracle Strategy', fa_title: 'مشاور استراتژیک بازار', limit: 5, icon: <Target size={28}/>, type: 'text', desc: 'سوالات خود درباره رشد پیج را بپرسید.' },
   { id: 'nexus', title: 'Nexus Protocol', fa_title: 'پروتکل نگارش رسمی', limit: 10, icon: <Wand2 size={28}/>, type: 'text', desc: 'تبدیل متن ساده به اداری و با پرستیژ.' }
 ];
@@ -154,11 +154,12 @@ const App = () => {
           contents: [{ parts: [{ text: `Act as the Sovereign AI Assistant for REZIBEL PROMPT. Respond in Persian. Tone: Professional, Cinematic, Luxury. Question: ${chatInput}` }] }]
         })
       });
+      if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
       const botText = data.candidates?.[0]?.content?.parts?.[0]?.text || "خطا در دریافت پاسخ.";
       setChatLog(prev => [...prev, { role: 'bot', text: botText }]);
     } catch (e) {
-      setChatLog(prev => [...prev, { role: 'bot', text: "ارتباط با هسته مرکزی برقرار نشد." }]);
+      setChatLog(prev => [...prev, { role: 'bot', text: "ارتباط با هسته مرکزی برقرار نشد. لطفاً اتصال (VPN) خود را بررسی کنید." }]);
     } finally {
       setIsChatLoading(false);
     }
@@ -176,28 +177,49 @@ const App = () => {
     try {
       if (module.type === 'image') {
         const seed = Math.floor(Math.random() * 99999);
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(input)}?seed=${seed}&width=1024&height=1024&nologo=true`;
-        await new Promise(r => setTimeout(r, 1500)); 
-        setAiResults(prev => ({ ...prev, [module.id]: imageUrl }));
+        const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(input)}?width=1024&height=1024&seed=${seed}&nologo=true`;
+        
+        // Preload image to ensure it's generated
+        const img = new Image();
+        img.src = imageUrl;
+        img.onload = () => {
+            setAiResults(prev => ({ ...prev, [module.id]: imageUrl }));
+            setIsAiLoading(prev => ({ ...prev, [module.id]: false }));
+        };
+        img.onerror = () => {
+            throw new Error("Image generation failed");
+        };
+
       } else {
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: `Respond in Persian. Creative Director tone. Prompt: ${input}` }] }] })
         });
+        if (!response.ok) throw new Error("Network error");
         const data = await response.json();
         setAiResults(prev => ({ ...prev, [module.id]: data.candidates[0].content.parts[0].text }));
+        setIsAiLoading(prev => ({ ...prev, [module.id]: false }));
       }
+
       if (!isAdmin) {
         const newQuotas = { ...quotas, [module.id]: remaining - 1 };
         setQuotas(newQuotas);
         localStorage.setItem('neural_quotas', JSON.stringify({ date: new Date().toDateString(), usage: newQuotas }));
       }
     } catch (e) {
-      alert("خطا: " + e.message);
-    } finally {
+      alert("ارتباط با هسته هوش مصنوعی برقرار نشد. لطفاً اتصال اینترنت و فیلترشکن خود را بررسی کنید.");
       setIsAiLoading(prev => ({ ...prev, [module.id]: false }));
     }
+  };
+
+  const downloadImage = (url) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Rezibel-Art-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const addArchive = async () => {
@@ -295,7 +317,7 @@ const App = () => {
               {portfolio.filter(p => p.type !== 'animation').map((item) => (
                 <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95">
                   <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
-                    <img src={item.cover_url} className="w-full h-full object-cover opacity-70" alt={item.title} loading="lazy" />
+                    <img src={item.cover_url} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
                     <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
                       <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
                       <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
@@ -382,8 +404,17 @@ const App = () => {
                         <span className="text-[#40E0D0] text-[9px] font-black font-mono tracking-widest">OUTPUT</span>
                         <button onClick={() => setAiResults({...aiResults, [module.id]: null})}><X size={20} className="text-zinc-500"/></button>
                       </div>
-                      <div className="flex-1 overflow-y-auto custom-scrollbar">
-                        {module.type === 'image' ? <img src={aiResults[module.id]} className="w-full h-full object-cover rounded-2xl border border-white/10" alt="AI" /> : <p className="text-sm text-zinc-200 font-[Vazirmatn] leading-relaxed text-right" dir="rtl">{aiResults[module.id]}</p>}
+                      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col items-center">
+                        {module.type === 'image' ? (
+                          <>
+                            <img src={aiResults[module.id]} className="w-full rounded-2xl border border-white/10 mb-6 shadow-2xl" alt="AI Generated" />
+                            <button onClick={() => downloadImage(aiResults[module.id])} className="w-full py-3 bg-[#40E0D0] text-black rounded-xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-2">
+                               <Download size={16}/> Download Masterpiece
+                            </button>
+                          </>
+                        ) : (
+                          <p className="text-sm text-zinc-200 font-[Vazirmatn] leading-relaxed text-right w-full" dir="rtl">{aiResults[module.id]}</p>
+                        )}
                       </div>
                     </div>
                   )}
