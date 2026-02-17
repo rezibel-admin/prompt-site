@@ -335,7 +335,7 @@ const App = () => {
             </div>
           </section>
 
-          {/* NEURAL ANIMATIONS */}
+          {/* NEURAL ANIMATIONS (ACTIVATED) */}
           <section className="mb-64 md:mb-96 relative">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-8 px-2">
                <div>
@@ -344,10 +344,24 @@ const App = () => {
                </div>
             </div>
             <div ref={animScrollRef} className="flex gap-6 md:gap-12 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-12 px-2 md:px-4">
-               <div className="min-w-[85vw] md:min-w-[450px] aspect-square glass-luxury rounded-[3rem] flex flex-col items-center justify-center border-dashed border-white/20 snap-center">
-                 <RefreshCw className="animate-spin text-[#40E0D0]/30 mb-4" size={48}/>
-                 <span className="font-mono text-zinc-500 text-[10px] tracking-widest">ANIMATION VAULT LOADING...</span>
-               </div>
+               {portfolio.filter(p => p.type === 'animation').length > 0 ? (
+                 portfolio.filter(p => p.type === 'animation').map((item) => (
+                    <div key={item.id} className="min-w-[85vw] md:min-w-[500px] aspect-[9/16] rounded-[3rem] md:rounded-[4rem] overflow-hidden border border-white/10 glass-luxury snap-center relative shadow-2xl transition-transform active:scale-95">
+                      <div className="absolute inset-0 cursor-pointer" onClick={() => { setActiveVideo(item); bgMusic.current.pause(); }}>
+                        <img src={item.cover_url} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 opacity-70" alt={item.title} loading="lazy" />
+                        <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/90 via-transparent">
+                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border border-[#40E0D0]/60 flex items-center justify-center text-[#40E0D0] mb-4 backdrop-blur-md bg-black/20"><Play size={24} fill="currentColor"/></div>
+                          <h3 className="text-2xl md:text-3xl font-black uppercase tracking-widest italic">{item.title}</h3>
+                        </div>
+                      </div>
+                    </div>
+                 ))
+               ) : (
+                 <div className="min-w-[85vw] md:min-w-[450px] aspect-square glass-luxury rounded-[3rem] flex flex-col items-center justify-center border-dashed border-white/20 snap-center">
+                   <RefreshCw className="animate-spin text-[#40E0D0]/30 mb-4" size={48}/>
+                   <span className="font-mono text-zinc-500 text-[10px] tracking-widest">ANIMATION VAULT LOADING...</span>
+                 </div>
+               )}
             </div>
           </section>
 
@@ -408,7 +422,7 @@ const App = () => {
                         {module.type === 'image' ? (
                           <>
                             <img src={aiResults[module.id]} className="w-full rounded-2xl border border-white/10 mb-6 shadow-2xl" alt="AI Generated" />
-                            <button onClick={() => downloadImage(aiResults[module.id])} className="w-full py-3 bg-[#40E0D0] text-black rounded-xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-2">
+                            <button onClick={() => downloadImage(aiResults[module.id])} className="w-full py-3 bg-[#40E0D0] text-black rounded-xl font-black text-[10px] tracking-widest uppercase flex items-center justify-center gap-2 mt-4 hover:bg-white transition-colors">
                                <Download size={16}/> Download Masterpiece
                             </button>
                           </>
